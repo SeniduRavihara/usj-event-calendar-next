@@ -64,4 +64,15 @@ export default function AdminDashboard() {
     maxReg: 0
   });
 
+    // Notification system
+  const [notifications, setNotifications] = useState<Array<{id: string, message: string, type: 'success' | 'error'}>>([]);
+
+  const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
+    const id = Date.now().toString();
+    setNotifications(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }, 3000);
+  };
+
 }
