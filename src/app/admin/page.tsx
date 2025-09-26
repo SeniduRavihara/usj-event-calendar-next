@@ -75,4 +75,80 @@ export default function AdminDashboard() {
     }, 3000);
   };
 
+    // Event CRUD operations
+  const openCreateModal = () => {
+    setEditingEvent(null);
+    setFormData({
+      title: '',
+      department: '',
+      description: '',
+      date: '',
+      time: '',
+      location: '',
+      maxReg: 0
+    });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (event: Event) => {
+    setEditingEvent(event);
+    setFormData({
+      title: event.title,
+      department: event.department,
+      description: event.description,
+      date: event.date,
+      time: event.time,
+      location: event.location,
+      maxReg: event.maxReg
+    });
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingEvent(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    if (editingEvent) {
+      // Update existing event
+      setEvents(prev => prev.map(event => 
+        event.id === editingEvent.id 
+          ? { ...event, ...formData, department: formData.department as 'cs' | 'se' | 'is' }
+          : event
+      ));
+      showNotification('Event updated successfully!');
+    } else {
+      // Create new event
+      const newEvent: Event = {
+        id: Date.now(),
+        ...formData,
+        department: formData.department as 'cs' | 'se' | 'is',
+        currentReg: 0
+      };
+      setEvents(prev => [...prev, newEvent]);
+      showNotification('Event created successfully!');
+    }
+
+    setIsLoading(false);
+    closeModal();
+  };
+
+  const deleteEvent = (id: number) => {
+    if (confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
+      setEvents(prev => prev.filter(event => event.id !== id));
+      showNotification('Event deleted successfully!');
+    }
+  };
+
+  const viewEvent = (event: Event) => {
+    alert(`Viewing details for "${event.title}". In a real application, this would open a detailed view.`);
+  };
+
 }
