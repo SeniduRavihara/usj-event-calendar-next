@@ -16,3 +16,26 @@ import {
   MapPin,
   X
 } from 'lucide-react';
+
+// Types
+interface Event {
+  id: number;
+  title: string;
+  department: 'cs' | 'se' | 'is';
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  maxReg: number;
+  currentReg: number;
+}
+
+interface EventFormData {
+  title: string;
+  department: 'cs' | 'se' | 'is' | '';
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  maxReg: number;
+}
