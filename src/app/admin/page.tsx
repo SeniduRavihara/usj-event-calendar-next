@@ -151,4 +151,37 @@ export default function AdminDashboard() {
     alert(`Viewing details for "${event.title}". In a real application, this would open a detailed view.`);
   };
 
+    // Utility functions
+  const getDepartmentInfo = (department: string) => {
+    switch (department) {
+      case 'cs': return { name: 'CS', color: 'bg-blue-500', icon: '🤖' };
+      case 'se': return { name: 'SE', color: 'bg-emerald-500', icon: '🏗️' };
+      case 'is': return { name: 'IS', color: 'bg-purple-500', icon: '🗃️' };
+      default: return { name: 'UN', color: 'bg-gray-500', icon: '📋' };
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'short', day: 'numeric'
+    });
+  };
+
+  const formatTime = (timeString: string) => {
+    const [hours, minutes] = timeString.split(':');
+    const date = new Date();
+    date.setHours(parseInt(hours), parseInt(minutes));
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  };
+
+  // Filter events
+  const filteredEvents = events.filter(event => {
+    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         event.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesDepartment = departmentFilter === 'all' || event.department === departmentFilter;
+    return matchesSearch && matchesDepartment;
+  });
+
+
 }
