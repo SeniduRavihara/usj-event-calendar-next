@@ -1,24 +1,48 @@
 // src/middleware.ts
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifyToken } from "./lib/auth";
+import { NextResponse } from "next/server";
+import { getCurrentUser } from "./lib/auth";
 
 export function middleware(req: NextRequest) {
-  const token = req.cookies.get("token")?.value;
+  const user = getCurrentUser(req);
+  const { pathname } = req.nextUrl;
 
-  if (req.nextUrl.pathname.startsWith("/dashboard")) {
-    if (!token) return NextResponse.redirect(new URL("/login", req.url));
+  // Protected routes that require authentication
+  const protectedRoutes = ["/dashboard", "/admin", "/profile"];
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
 
-    try {
-      verifyToken(token);
-      return NextResponse.next();
-    } catch {
+  // Admin-only routes
+  const adminRoutes = ["/admin"];
+  const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
+
+  if (isProtectedRoute) {
+    if (!user) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
+
+    // Check admin access
+    if (isAdminRoute && user.role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
   }
+
+  // Redirect authenticated users away from auth pages
+  if (user && (pathname === "/login" || pathname === "/register")) {
+    const redirectUrl = user.role === "ADMIN" ? "/admin" : "/dashboard";
+    return NextResponse.redirect(new URL(redirectUrl, req.url));
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/admin/:path*",
+    "/profile/:path*",
+    "/login",
+    "/register",
+  ],
 };
-// This middleware protects the /dashboard route, ensuring only authenticated users can access it.
