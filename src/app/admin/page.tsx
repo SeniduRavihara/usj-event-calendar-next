@@ -264,6 +264,9 @@ export default function AdminDashboard() {
   };
 
   const formatDate = (dateString: string) => {
+    if (!dateString || dateString.trim() === "") {
+      return "No date set";
+    }
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
@@ -272,6 +275,9 @@ export default function AdminDashboard() {
   };
 
   const formatTime = (timeString: string) => {
+    if (!timeString || timeString.trim() === "") {
+      return "No time set";
+    }
     const [hours, minutes] = timeString.split(":");
     const date = new Date();
     date.setHours(parseInt(hours), parseInt(minutes));
@@ -281,6 +287,23 @@ export default function AdminDashboard() {
       hour12: true,
     });
   };
+
+  // Calculate department event counts
+  const getDepartmentCounts = () => {
+    const counts: { [key: string]: number } = {};
+
+    events.forEach((event) => {
+      if (event.departments && Array.isArray(event.departments)) {
+        event.departments.forEach((dept: string) => {
+          counts[dept] = (counts[dept] || 0) + 1;
+        });
+      }
+    });
+
+    return counts;
+  };
+
+  const departmentCounts = getDepartmentCounts();
 
   // Filter events
   const filteredEvents = events.filter((event) => {
@@ -544,7 +567,7 @@ export default function AdminDashboard() {
                                   <Calendar className="w-4 h-4" />
                                   <span>
                                     {formatDate(event.date)} at{" "}
-                                    {formatTime(event.time)}
+                                    {event.time || "No time set"}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-1">
@@ -638,7 +661,7 @@ export default function AdminDashboard() {
                       </span>
                     </div>
                     <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
-                      12 events
+                      {departmentCounts["CS"] || 0} events
                     </span>
                   </div>
                   <div className="flex items-center justify-between py-3 border-b border-slate-100">
@@ -649,7 +672,7 @@ export default function AdminDashboard() {
                       </span>
                     </div>
                     <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
-                      8 events
+                      {departmentCounts["SE"] || 0} events
                     </span>
                   </div>
                   <div className="flex items-center justify-between py-3">
@@ -660,7 +683,7 @@ export default function AdminDashboard() {
                       </span>
                     </div>
                     <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
-                      6 events
+                      {departmentCounts["IS"] || 0} events
                     </span>
                   </div>
                 </div>

@@ -67,21 +67,58 @@ export default function Dashboard() {
     fetchEvents();
   }, []);
 
-  const departments: Department[] = [
-    { name: "Computer Science", code: "CS", eventCount: 12, color: "#3b82f6" },
-    {
-      name: "Software Engineering",
-      code: "SE",
-      eventCount: 8,
-      color: "#10b981",
-    },
-    {
-      name: "Information Systems",
-      code: "IS",
-      eventCount: 6,
-      color: "#8b5cf6",
-    },
-  ];
+  // Calculate real department data from events
+  const getDepartmentData = (): Department[] => {
+    const departmentCounts: { [key: string]: number } = {};
+
+    // Count events for each department
+    events.forEach((event) => {
+      if (event.departments && Array.isArray(event.departments)) {
+        event.departments.forEach((dept: string) => {
+          departmentCounts[dept] = (departmentCounts[dept] || 0) + 1;
+        });
+      }
+    });
+
+    return [
+      {
+        name: "Computer Science",
+        code: "CS",
+        eventCount: departmentCounts["CS"] || 0,
+        color: "#3b82f6",
+      },
+      {
+        name: "Software Engineering",
+        code: "SE",
+        eventCount: departmentCounts["SE"] || 0,
+        color: "#10b981",
+      },
+      {
+        name: "Information Systems",
+        code: "IS",
+        eventCount: departmentCounts["IS"] || 0,
+        color: "#8b5cf6",
+      },
+    ];
+  };
+
+  const departments = getDepartmentData();
+
+  // Calculate events for current month
+  const getCurrentMonthEvents = () => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    return events.filter((event) => {
+      if (!event.date) return false;
+      const eventDate = new Date(event.date);
+      return (
+        eventDate.getMonth() === currentMonth &&
+        eventDate.getFullYear() === currentYear
+      );
+    }).length;
+  };
 
   const filteredEvents = events.filter((event) => {
     const matchesSearch =
@@ -650,7 +687,7 @@ export default function Dashboard() {
           <div className="stats-grid">
             <div className="stat-card upcoming-events">
               <div className="stat-info">
-                <h3>{filteredEvents.length}</h3>
+                <h3>{getCurrentMonthEvents()}</h3>
                 <p>This month</p>
               </div>
               <div className="stat-icon">📅</div>
