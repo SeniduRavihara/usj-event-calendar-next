@@ -196,15 +196,21 @@ export default function Dashboard() {
           .dashboard-container {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
               sans-serif;
-            background-color: #f8fafc;
-            color: #334155;
+            background: linear-gradient(
+              135deg,
+              #0f172a 0%,
+              #1e1b4b 50%,
+              #0f172a 100%
+            );
+            color: #f8fafc;
             line-height: 1.6;
             min-height: 100vh;
           }
 
           .header {
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
@@ -220,14 +226,15 @@ export default function Dashboard() {
           .logo {
             width: 40px;
             height: 40px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            border-radius: 8px;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 18px;
             font-weight: 600;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
           }
 
           .logo-text {
@@ -238,12 +245,12 @@ export default function Dashboard() {
           .logo-title {
             font-size: 16px;
             font-weight: 600;
-            color: #1e293b;
+            color: #f8fafc;
           }
 
           .logo-subtitle {
             font-size: 12px;
-            color: #64748b;
+            color: #94a3b8;
           }
 
           .header-actions {
@@ -253,12 +260,17 @@ export default function Dashboard() {
           }
 
           .full-calendar-btn {
-            color: #64748b;
+            color: #94a3b8;
             text-decoration: none;
             font-size: 14px;
             display: flex;
             align-items: center;
             gap: 4px;
+            transition: color 0.2s ease;
+          }
+
+          .full-calendar-btn:hover {
+            color: #f8fafc;
           }
 
           .notification-icon,
@@ -269,10 +281,17 @@ export default function Dashboard() {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #f1f5f9;
-            color: #64748b;
+            background: rgba(71, 85, 105, 0.3);
+            color: #94a3b8;
             cursor: pointer;
             position: relative;
+            transition: all 0.2s ease;
+          }
+
+          .notification-icon:hover,
+          .profile-icon:hover {
+            background: rgba(71, 85, 105, 0.5);
+            color: #f8fafc;
           }
 
           .notification-icon::after {
@@ -299,7 +318,7 @@ export default function Dashboard() {
           .welcome-title {
             font-size: 2rem;
             font-weight: 700;
-            color: #1e293b;
+            color: #f8fafc;
             margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
@@ -307,16 +326,17 @@ export default function Dashboard() {
           }
 
           .new-events-badge {
-            background: #dcfce7;
-            color: #16a34a;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
             padding: 4px 8px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 500;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
           }
 
           .welcome-description {
-            color: #4b5563;
+            color: #94a3b8;
             font-size: 16px;
             max-width: 600px;
           }
@@ -329,13 +349,22 @@ export default function Dashboard() {
           }
 
           .stat-card {
-            background: white;
-            border-radius: 12px;
+            background: rgba(30, 27, 75, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 16px;
             padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            transition: all 0.3s ease;
+          }
+
+          .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(139, 92, 246, 0.5);
           }
 
           .stat-info h3 {
@@ -377,10 +406,12 @@ export default function Dashboard() {
           }
 
           .events-section {
-            background: white;
-            border-radius: 12px;
+            background: rgba(30, 27, 75, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 16px;
             padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
           }
 
           .search-filter {
@@ -392,61 +423,79 @@ export default function Dashboard() {
           .search-input {
             flex: 1;
             padding: 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            border-radius: 12px;
             font-size: 14px;
-            background: white;
-            color: #1f2937;
+            background: rgba(51, 65, 85, 0.3);
+            color: #f8fafc;
+            transition: all 0.2s ease;
           }
 
           .search-input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+            background: rgba(51, 65, 85, 0.5);
+          }
+
+          .search-input::placeholder {
+            color: #94a3b8;
           }
 
           .filter-select {
             padding: 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            border-radius: 12px;
             font-size: 14px;
-            background: white;
-            color: #1f2937;
+            background: rgba(51, 65, 85, 0.3);
+            color: #f8fafc;
             min-width: 150px;
+            transition: all 0.2s ease;
           }
 
           .filter-select:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+            background: rgba(51, 65, 85, 0.5);
           }
 
           .section-title {
             font-size: 1.5rem;
             font-weight: 600;
-            color: #1e293b;
+            color: #f8fafc;
             margin-bottom: 1.5rem;
           }
 
           .event-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 16px;
             padding: 1.5rem;
             margin-bottom: 1rem;
             display: flex;
             align-items: center;
             gap: 1rem;
+            background: rgba(51, 65, 85, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+          }
+
+          .event-card:hover {
+            border-color: rgba(139, 92, 246, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
           }
 
           .event-icon {
             width: 48px;
             height: 48px;
-            background: #f1f5f9;
-            border-radius: 8px;
+            background: rgba(71, 85, 105, 0.3);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
+            border: 1px solid rgba(71, 85, 105, 0.5);
           }
 
           .event-content {
@@ -541,10 +590,20 @@ export default function Dashboard() {
 
           .calendar-widget,
           .departments-widget {
-            background: white;
-            border-radius: 12px;
+            background: rgba(30, 27, 75, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 16px;
             padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+          }
+
+          .calendar-widget:hover,
+          .departments-widget:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(139, 92, 246, 0.5);
           }
 
           .calendar-month {
@@ -556,10 +615,15 @@ export default function Dashboard() {
           }
 
           .calendar-link {
-            color: #4b5563;
+            color: #94a3b8;
             font-size: 14px;
             text-align: center;
             text-decoration: none;
+            transition: color 0.2s ease;
+          }
+
+          .calendar-link:hover {
+            color: #f8fafc;
           }
 
           .department-item {
@@ -567,7 +631,7 @@ export default function Dashboard() {
             align-items: center;
             justify-content: space-between;
             padding: 0.75rem 0;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
           }
 
           .department-item:last-child {
@@ -579,7 +643,7 @@ export default function Dashboard() {
             align-items: center;
             gap: 8px;
             font-size: 14px;
-            color: #1e293b;
+            color: #f8fafc;
           }
 
           .department-dot {
@@ -600,7 +664,7 @@ export default function Dashboard() {
 
           .event-count {
             font-size: 12px;
-            color: #4b5563;
+            color: #94a3b8;
           }
 
           @media (max-width: 768px) {

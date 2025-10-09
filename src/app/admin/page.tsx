@@ -330,7 +330,7 @@ export default function AdminDashboard() {
 
   return (
     <ProtectedRoute requiredRole="ADMIN">
-      <div className="min-h-screen bg-blue-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         {/* Notifications */}
         <div className="fixed top-4 right-4 z-50 space-y-2">
           {notifications.map((notification) => (
@@ -348,16 +348,16 @@ export default function AdminDashboard() {
         </div>
 
         {/* Header */}
-        <header className="bg-sky-300 border-b border-slate-200 px-4 lg:px-8 py-4 flex justify-between items-center">
+        <header className="bg-slate-800/80 backdrop-blur-xl border-b border-slate-700/50 px-4 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-lg font-semibold">
               📅
             </div>
             <div className="flex flex-col">
-              <div className="text-base font-semibold text-slate-800">
+              <div className="text-base font-semibold text-white">
                 Faculty Events Admin
               </div>
-              <div className="text-xs text-slate-600 hidden sm:block">
+              <div className="text-xs text-slate-300 hidden sm:block">
                 University of Sri Jayewardenepura
               </div>
             </div>
@@ -365,23 +365,23 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-4">
             <a
               href="/calendar"
-              className="hidden sm:flex items-center gap-2 text-slate-600 hover:text-slate-800 transition-colors text-sm"
+              className="hidden sm:flex items-center gap-2 text-slate-300 hover:text-white transition-colors text-sm"
             >
               <Calendar className="w-4 h-4" />
               <span>Full Calendar</span>
             </a>
             <div className="relative">
-              <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer">
+              <div className="w-8 h-8 bg-slate-700/50 rounded-full flex items-center justify-center text-slate-300 hover:bg-slate-600/50 transition-colors cursor-pointer">
                 <Bell className="w-4 h-4" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
               </div>
             </div>
-            <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer">
+            <div className="w-8 h-8 bg-slate-700/50 rounded-full flex items-center justify-center text-slate-300 hover:bg-slate-600/50 transition-colors cursor-pointer">
               <User className="w-4 h-4" />
             </div>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
+              className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-red-500/25"
             >
               Logout
             </button>
@@ -392,16 +392,16 @@ export default function AdminDashboard() {
         <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
           {/* Welcome Section */}
           <section className="mb-8">
-            <h1 className="text-3xl font-bold text-slate-800 mb-2 flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
               Welcome back, {user?.name || "Admin"}!
-              <span className="bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full text-sm font-medium">
+              <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
                 ● Admin
               </span>
-              <span className="bg-green-200 text-green-800 px-2 py-1 rounded-full text-sm font-medium">
+              <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
                 ● {events.length} events
               </span>
             </h1>
-            <p className="text-gray-700 max-w-2xl">
+            <p className="text-slate-300 max-w-2xl">
               Manage events, workshops, and activities across Computer Science,
               Software Engineering, and Information Systems departments.
             </p>
@@ -409,45 +409,45 @@ export default function AdminDashboard() {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <div className="bg-emerald-100 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1 hover:border-2 hover:border-green-500 cursor-pointer">
+            <div className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 hover:-translate-y-2 hover:border-purple-500/50 cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-3xl font-bold text-slate-800 mb-1">
+                  <h3 className="text-3xl font-bold text-white mb-1">
                     {events.length}
                   </h3>
-                  <p className="text-gray-700 text-sm">Total events</p>
+                  <p className="text-slate-300 text-sm">Total events</p>
                 </div>
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-slate-700">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white shadow-lg">
                   <Calendar className="w-6 h-6" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-emerald-100 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1 hover:border-2 hover:border-green-500 cursor-pointer">
+            <div className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 hover:-translate-y-2 hover:border-purple-500/50 cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-3xl font-bold text-slate-800 mb-1">
+                  <h3 className="text-3xl font-bold text-white mb-1">
                     {filteredEvents.length}
                   </h3>
-                  <p className="text-gray-700 text-sm">Filtered events</p>
+                  <p className="text-slate-300 text-sm">Filtered events</p>
                 </div>
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-slate-700">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-white shadow-lg">
                   <Users className="w-6 h-6" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-emerald-100 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1 hover:border-2 hover:border-green-500 cursor-pointer">
+            <div className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 hover:-translate-y-2 hover:border-purple-500/50 cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-3xl font-bold text-slate-800 mb-1">
+                  <h3 className="text-3xl font-bold text-white mb-1">
                     {user?.department || "N/A"}
                   </h3>
-                  <p className="text-gray-700 text-sm">
+                  <p className="text-slate-300 text-sm">
                     {user?.student_id || "Admin"}
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-slate-700">
+                <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center text-white shadow-lg">
                   <GraduationCap className="w-6 h-6" />
                 </div>
               </div>
@@ -458,13 +458,13 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Events Section */}
             <div className="lg:col-span-2">
-              <section className="bg-blue-200 rounded-xl p-6 shadow-lg">
+              <section className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl">
                 {/* Admin Panel */}
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
-                  <h3 className="text-orange-800 font-medium text-sm mb-2 flex items-center gap-2">
+                <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-xl p-4 mb-6 backdrop-blur-sm">
+                  <h3 className="text-orange-400 font-medium text-sm mb-2 flex items-center gap-2">
                     🔧 Admin Controls
                   </h3>
-                  <p className="text-orange-700 text-xs">
+                  <p className="text-orange-300 text-xs">
                     You have full access to create, edit, and delete events.
                     Changes will be reflected immediately.
                   </p>
@@ -474,7 +474,7 @@ export default function AdminDashboard() {
                 <div className="flex justify-between items-center mb-6">
                   <button
                     onClick={openCreateModal}
-                    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition-all hover:-translate-y-1 shadow-lg"
+                    className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-6 py-3 rounded-xl font-medium transition-all hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/25"
                   >
                     <Plus className="w-4 h-4" />
                     Create Event
@@ -490,7 +490,7 @@ export default function AdminDashboard() {
                       placeholder="Search events..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900"
+                      className="w-full pl-10 pr-4 py-3 border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors bg-slate-700/50 text-white placeholder-slate-400"
                     />
                   </div>
                   <div className="relative">
@@ -498,7 +498,7 @@ export default function AdminDashboard() {
                     <select
                       value={departmentFilter}
                       onChange={(e) => setDepartmentFilter(e.target.value)}
-                      className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900 min-w-[200px]"
+                      className="pl-10 pr-8 py-3 border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors bg-slate-700/50 text-white min-w-[200px]"
                     >
                       <option value="all">All Departments</option>
                       <option value="cs">Computer Science</option>
@@ -508,7 +508,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <h2 className="text-xl font-semibold text-slate-800 mb-6">
+                <h2 className="text-xl font-semibold text-white mb-6">
                   Upcoming Events
                 </h2>
 
@@ -542,15 +542,15 @@ export default function AdminDashboard() {
                       return (
                         <div
                           key={event.id}
-                          className="bg-sky-200 border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:border-indigo-300 hover:-translate-y-1 transition-all duration-200"
+                          className="bg-slate-700/50 border border-slate-600/50 rounded-2xl p-6 hover:shadow-lg hover:border-purple-500/50 hover:-translate-y-1 transition-all duration-200 backdrop-blur-sm"
                         >
                           <div className="flex items-start gap-4">
-                            <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-xl flex-shrink-0">
+                            <div className="w-12 h-12 bg-slate-600/50 rounded-xl flex items-center justify-center text-xl flex-shrink-0 border border-slate-500/50">
                               {departmentInfo.icon}
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-3 mb-2">
-                                <h3 className="text-lg font-semibold text-slate-800 truncate">
+                                <h3 className="text-lg font-semibold text-white truncate">
                                   {event.title}
                                 </h3>
                                 <span
@@ -559,10 +559,10 @@ export default function AdminDashboard() {
                                   {departmentInfo.name}
                                 </span>
                               </div>
-                              <p className="text-gray-700 text-sm mb-3">
+                              <p className="text-slate-300 text-sm mb-3">
                                 {event.description}
                               </p>
-                              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
+                              <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400 mb-4">
                                 <div className="flex items-center gap-1">
                                   <Calendar className="w-4 h-4" />
                                   <span>

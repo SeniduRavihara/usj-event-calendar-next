@@ -110,64 +110,78 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 p-4">
-      <div
-        className="absolute inset-0 opacity-40"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23AC92E4' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
-        }}
-      ></div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+      {/* Animated background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -inset-10 opacity-30">
+          <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
+          <div className="absolute top-0 -right-4 w-72 h-72 bg-yellow-500 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
+        </div>
+      </div>
 
       <div className="relative w-full max-w-md">
-        <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-8 relative overflow-hidden">
+        <div className="bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/50 p-8 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500"></div>
 
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl mb-4 shadow-lg">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-600 rounded-3xl mb-6 shadow-2xl">
               <svg
-                className="w-8 h-8 text-white"
+                className="w-10 h-10 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                <polyline points="10 17 15 12 10 7"></polyline>
-                <line x1="15" y1="12" x2="3" y2="12"></line>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              Welcome Back
-            </h1>
-            <p className="text-gray-600">Sign in to access university events</p>
+            <h1 className="text-4xl font-bold text-white mb-3">Welcome Back</h1>
+            <p className="text-slate-400 text-lg">
+              Sign in to access university events
+            </p>
           </div>
 
           {/* API Error */}
           {errors.api && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm backdrop-blur-sm">
               {errors.api}
             </div>
           )}
 
           <div className="space-y-5">
             {/* Email Field */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label
                 htmlFor="email"
-                className="text-sm font-semibold text-gray-700"
+                className="text-sm font-semibold text-slate-300"
               >
                 Email Address
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <svg
-                    className="w-5 h-5 text-gray-400"
+                    className="w-5 h-5 text-slate-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path d="M4 7V4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v3"></path>
-                    <path d="M21 8 12 13l-9-5"></path>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 7V4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v3"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 8 12 13l-9-5"
+                    />
                   </svg>
                 </div>
                 <input
@@ -175,45 +189,43 @@ export default function LoginPage() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
-                  className={`w-full pl-10 pr-4 py-3 bg-gray-50/50 border rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${
+                  className={`w-full pl-12 pr-4 py-4 bg-slate-700/50 border rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 text-white placeholder-slate-400 ${
                     errors.email
-                      ? "border-red-300 focus:ring-red-200"
-                      : "border-gray-200 focus:ring-purple-200 focus:bg-white"
+                      ? "border-red-500/50 focus:ring-red-500/20"
+                      : "border-slate-600/50 focus:ring-purple-500/20 focus:bg-slate-700/70"
                   }`}
                   placeholder="Enter your email"
                 />
               </div>
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                <p className="text-red-400 text-sm mt-2">{errors.email}</p>
               )}
             </div>
 
             {/* Password Field */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label
                 htmlFor="password"
-                className="text-sm font-semibold text-gray-700"
+                className="text-sm font-semibold text-slate-300"
               >
                 Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <svg
-                    className="w-5 h-5 text-gray-400"
+                    className="w-5 h-5 text-slate-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <rect
-                      x="3"
-                      y="11"
-                      width="18"
-                      height="11"
-                      rx="2"
-                      ry="2"
-                    ></rect>
-                    <circle cx="12" cy="16" r="1"></circle>
-                    <path d="m7 11V7a5 5 0 0 1 10 0v4"></path>
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <circle cx="12" cy="16" r="1" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="m7 11V7a5 5 0 0 1 10 0v4"
+                    />
                   </svg>
                 </div>
                 <input
@@ -223,37 +235,47 @@ export default function LoginPage() {
                   onChange={(e) =>
                     handleInputChange("password", e.target.value)
                   }
-                  className={`w-full pl-10 pr-12 py-3 bg-gray-50/50 border rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${
+                  className={`w-full pl-12 pr-14 py-4 bg-slate-700/50 border rounded-2xl focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 text-white placeholder-slate-400 ${
                     errors.password
-                      ? "border-red-300 focus:ring-red-200"
-                      : "border-gray-200 focus:ring-purple-200 focus:bg-white"
+                      ? "border-red-500/50 focus:ring-red-500/20"
+                      : "border-slate-600/50 focus:ring-purple-500/20 focus:bg-slate-700/70"
                   }`}
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center hover:bg-slate-600/20 rounded-r-2xl transition-colors"
                 >
                   <svg
-                    className="w-5 h-5 text-gray-400"
+                    className="w-5 h-5 text-slate-400 hover:text-slate-300"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
                     {showPassword ? (
-                      <path d="m15 18-.722-3.25m-1.278 1.25L12 14m-3 4-.722-3.25M2 2l20 20"></path>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="m15 18-.722-3.25m-1.278 1.25L12 14m-3 4-.722-3.25M2 2l20 20"
+                      />
                     ) : (
                       <>
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                        />
+                        <circle cx="12" cy="12" r="3" />
                       </>
                     )}
                   </svg>
                 </button>
               </div>
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                <p className="text-red-400 text-sm mt-2">{errors.password}</p>
               )}
             </div>
 
@@ -266,13 +288,13 @@ export default function LoginPage() {
                   onChange={(e) =>
                     handleInputChange("rememberMe", e.target.checked)
                   }
-                  className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                  className="w-4 h-4 text-purple-500 bg-slate-700 border-slate-600 rounded focus:ring-purple-500 focus:ring-2"
                 />
-                <span className="ml-2 text-sm text-gray-600">Remember me</span>
+                <span className="ml-3 text-sm text-slate-300">Remember me</span>
               </label>
               <a
                 href="/forgot-password"
-                className="text-sm font-medium text-purple-600 hover:text-purple-700 transition-colors"
+                className="text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors"
               >
                 Forgot password?
               </a>
@@ -283,7 +305,7 @@ export default function LoginPage() {
               type="button"
               onClick={handleSubmit}
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white py-3 px-4 rounded-xl font-semibold shadow-lg hover:shadow-xl hover:from-purple-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white py-4 px-6 rounded-2xl font-semibold text-lg shadow-2xl hover:shadow-purple-500/25 hover:from-purple-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-800 transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {isLoading ? (
                 <div className="flex items-center">
@@ -326,17 +348,17 @@ export default function LoginPage() {
           </div>
 
           {/* Divider */}
-          <div className="my-6 flex items-center">
-            <div className="flex-1 border-t border-gray-200"></div>
-            <span className="px-4 text-sm text-gray-500 bg-white">or</span>
-            <div className="flex-1 border-t border-gray-200"></div>
+          <div className="my-8 flex items-center">
+            <div className="flex-1 border-t border-slate-600/50"></div>
+            <span className="px-4 text-sm text-slate-400 bg-slate-800">or</span>
+            <div className="flex-1 border-t border-slate-600/50"></div>
           </div>
 
           {/* Social Login */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             <button
               type="button"
-              className="w-full flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200"
+              className="w-full flex items-center justify-center px-6 py-4 border border-slate-600/50 rounded-2xl text-sm font-medium text-slate-300 bg-slate-700/30 hover:bg-slate-700/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-purple-500 transition-all duration-200 backdrop-blur-sm"
             >
               <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
                 <path
@@ -361,11 +383,11 @@ export default function LoginPage() {
           </div>
 
           {/* Sign Up Link */}
-          <p className="mt-8 text-center text-sm text-gray-600">
+          <p className="mt-8 text-center text-sm text-slate-400">
             Don't have an account?{" "}
             <a
               href="/register"
-              className="font-semibold text-purple-600 hover:text-purple-700 transition-colors"
+              className="font-semibold text-purple-400 hover:text-purple-300 transition-colors"
             >
               Create one here
             </a>
