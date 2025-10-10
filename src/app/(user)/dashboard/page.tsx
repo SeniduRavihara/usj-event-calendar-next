@@ -27,13 +27,6 @@ interface Event {
   updated_at: string;
 }
 
-interface Department {
-  name: string;
-  code: "CS" | "SE" | "IS";
-  eventCount: number;
-  color: string;
-}
-
 export default function Dashboard() {
   const { user, logout } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
@@ -66,43 +59,6 @@ export default function Dashboard() {
 
     fetchEvents();
   }, []);
-
-  // Calculate real department data from events
-  const getDepartmentData = (): Department[] => {
-    const departmentCounts: { [key: string]: number } = {};
-
-    // Count events for each department
-    events.forEach((event) => {
-      if (event.departments && Array.isArray(event.departments)) {
-        event.departments.forEach((dept: string) => {
-          departmentCounts[dept] = (departmentCounts[dept] || 0) + 1;
-        });
-      }
-    });
-
-    return [
-      {
-        name: "Computer Science",
-        code: "CS",
-        eventCount: departmentCounts["CS"] || 0,
-        color: "#3b82f6",
-      },
-      {
-        name: "Software Engineering",
-        code: "SE",
-        eventCount: departmentCounts["SE"] || 0,
-        color: "#10b981",
-      },
-      {
-        name: "Information Systems",
-        code: "IS",
-        eventCount: departmentCounts["IS"] || 0,
-        color: "#8b5cf6",
-      },
-    ];
-  };
-
-  const departments = getDepartmentData();
 
   // Calculate events for current month
   const getCurrentMonthEvents = () => {
@@ -374,7 +330,7 @@ export default function Dashboard() {
           }
 
           .stat-info p {
-            color: #4b5563;
+            color: #94a3b8;
             font-size: 14px;
           }
 
@@ -400,9 +356,7 @@ export default function Dashboard() {
           }
 
           .content-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
+            display: block;
           }
 
           .events-section {
@@ -504,13 +458,13 @@ export default function Dashboard() {
 
           .event-content a {
             text-decoration: none;
-            color: black;
+            color: #f8fafc;
           }
 
           .event-title {
             font-size: 16px;
             font-weight: 600;
-            color: #1e293b;
+            color: #f8fafc;
             margin-bottom: 0.25rem;
             display: flex;
             align-items: center;
@@ -518,7 +472,7 @@ export default function Dashboard() {
           }
 
           .event-subtitle {
-            color: #374151;
+            color: #94a3b8;
             font-size: 14px;
             margin-bottom: 0.5rem;
           }
@@ -528,7 +482,7 @@ export default function Dashboard() {
             align-items: center;
             gap: 1rem;
             font-size: 12px;
-            color: #4b5563;
+            color: #94a3b8;
           }
 
           .event-actions {
@@ -559,9 +513,9 @@ export default function Dashboard() {
           }
 
           .btn-secondary {
-            background: #f1f5f9;
-            color: #475569;
-            border: 1px solid #e2e8f0;
+            background: rgba(71, 85, 105, 0.3);
+            color: #f8fafc;
+            border: 1px solid rgba(71, 85, 105, 0.5);
           }
 
           .department-tag {
@@ -582,96 +536,7 @@ export default function Dashboard() {
             background: #8b5cf6;
           }
 
-          .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-          }
-
-          .calendar-widget,
-          .departments-widget {
-            background: rgba(30, 27, 75, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(71, 85, 105, 0.3);
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-          }
-
-          .calendar-widget:hover,
-          .departments-widget:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-            border-color: rgba(139, 92, 246, 0.5);
-          }
-
-          .calendar-month {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #8b5cf6;
-            text-align: center;
-            margin-bottom: 0.5rem;
-          }
-
-          .calendar-link {
-            color: #94a3b8;
-            font-size: 14px;
-            text-align: center;
-            text-decoration: none;
-            transition: color 0.2s ease;
-          }
-
-          .calendar-link:hover {
-            color: #f8fafc;
-          }
-
-          .department-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
-          }
-
-          .department-item:last-child {
-            border-bottom: none;
-          }
-
-          .department-name {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            color: #f8fafc;
-          }
-
-          .department-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-          }
-
-          .dot-cs {
-            background: #3b82f6;
-          }
-          .dot-se {
-            background: #10b981;
-          }
-          .dot-is {
-            background: #8b5cf6;
-          }
-
-          .event-count {
-            font-size: 12px;
-            color: #94a3b8;
-          }
-
           @media (max-width: 768px) {
-            .content-grid {
-              grid-template-columns: 1fr;
-            }
-
             .stats-grid {
               grid-template-columns: 1fr;
             }
@@ -788,11 +653,9 @@ export default function Dashboard() {
                   onChange={(e) => setSelectedDepartment(e.target.value)}
                 >
                   <option>All Departments</option>
-                  {departments.map((dept) => (
-                    <option key={dept.code} value={dept.code}>
-                      {dept.name}
-                    </option>
-                  ))}
+                  <option value="CS">Computer Science</option>
+                  <option value="SE">Software Engineering</option>
+                  <option value="IS">Information Systems</option>
                 </select>
               </div>
 
@@ -801,11 +664,11 @@ export default function Dashboard() {
               {loading ? (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-                  <p className="mt-4 text-gray-600">Loading events...</p>
+                  <p className="mt-4 text-slate-400">Loading events...</p>
                 </div>
               ) : error ? (
                 <div className="text-center py-8">
-                  <p className="text-red-600">{error}</p>
+                  <p className="text-red-400">{error}</p>
                   <button
                     onClick={() => window.location.reload()}
                     className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
@@ -815,7 +678,7 @@ export default function Dashboard() {
                 </div>
               ) : filteredEvents.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-600">No events found.</p>
+                  <p className="text-slate-400">No events found.</p>
                 </div>
               ) : (
                 filteredEvents.map((event) => (
@@ -874,35 +737,6 @@ export default function Dashboard() {
                 ))
               )}
             </section>
-
-            <aside className="sidebar">
-              <div className="calendar-widget">
-                <h3 className="section-title">Quick Calendar</h3>
-                <div className="calendar-month">June 2025</div>
-                <Link href="/calendar" className="calendar-link">
-                  Click to view full calendar
-                </Link>
-              </div>
-
-              <div className="departments-widget">
-                <h3 className="section-title">Departments</h3>
-                {departments.map((dept) => (
-                  <div key={dept.code} className="department-item">
-                    <div className="department-name">
-                      <span
-                        className={`department-dot ${getDepartmentDotClass(
-                          dept.code
-                        )}`}
-                      ></span>
-                      {dept.name}
-                    </div>
-                    <span className="event-count">
-                      {dept.eventCount} events
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </aside>
           </div>
         </main>
       </div>

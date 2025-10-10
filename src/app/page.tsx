@@ -164,8 +164,8 @@ export default function Home() {
                 </span>
               </Link>
             </div>
-          </div>
-        </main>
+        </div>
+      </main>
 
         {/* Features Section */}
         <section className="py-20 px-4 sm:px-6 lg:px-8">
@@ -284,7 +284,7 @@ export default function Home() {
               rights reserved.
             </p>
           </div>
-        </footer>
+      </footer>
       </div>
     </div>
   );

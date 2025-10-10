@@ -517,7 +517,7 @@ export default function AdminDashboard() {
                   {loading ? (
                     <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                      <p className="mt-4 text-gray-700">Loading events...</p>
+                      <p className="mt-4 text-slate-400">Loading events...</p>
                     </div>
                   ) : error ? (
                     <div className="text-center py-8">
@@ -531,7 +531,7 @@ export default function AdminDashboard() {
                     </div>
                   ) : filteredEvents.length === 0 ? (
                     <div className="text-center py-8">
-                      <p className="text-gray-700">No events found.</p>
+                      <p className="text-slate-400">No events found.</p>
                     </div>
                   ) : (
                     filteredEvents.map((event) => {
@@ -643,7 +643,7 @@ export default function AdminDashboard() {
                   <div className="text-2xl font-bold text-purple-600 mb-2">
                     July 2025
                   </div>
-                  <p className="text-sm text-gray-700">View full calendar →</p>
+                  <p className="text-sm text-slate-400">View full calendar →</p>
                 </div>
               </div>
 
@@ -660,7 +660,7 @@ export default function AdminDashboard() {
                         Computer Science
                       </span>
                     </div>
-                    <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                    <span className="text-xs text-slate-400 bg-slate-700/30 px-2 py-1 rounded-full">
                       {departmentCounts["CS"] || 0} events
                     </span>
                   </div>
@@ -671,7 +671,7 @@ export default function AdminDashboard() {
                         Software Engineering
                       </span>
                     </div>
-                    <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                    <span className="text-xs text-slate-400 bg-slate-700/30 px-2 py-1 rounded-full">
                       {departmentCounts["SE"] || 0} events
                     </span>
                   </div>
@@ -682,7 +682,7 @@ export default function AdminDashboard() {
                         Information Systems
                       </span>
                     </div>
-                    <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                    <span className="text-xs text-slate-400 bg-slate-700/30 px-2 py-1 rounded-full">
                       {departmentCounts["IS"] || 0} events
                     </span>
                   </div>
