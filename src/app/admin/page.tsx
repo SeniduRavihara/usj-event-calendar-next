@@ -3,10 +3,12 @@
 import {
   Bell,
   Calendar,
+  CalendarDays,
   Edit,
   Eye,
   Filter,
   GraduationCap,
+  List,
   MapPin,
   Plus,
   Search,
@@ -507,24 +509,26 @@ export default function AdminDashboard() {
               <button
                 type="button"
                 onClick={() => setActiveTab("list")}
-                className={`flex-1 py-6 px-8 rounded-xl font-medium transition-all duration-200 ${
+                className={`flex-1 py-6 px-8 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                   activeTab === "list"
                     ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
                     : "text-slate-400 hover:text-white"
                 }`}
               >
-                📋 Events List
+                <List className="w-5 h-5" />
+                Events List
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab("calendar")}
-                className={`flex-1 py-6 px-8 rounded-xl font-medium transition-all duration-200 ${
+                className={`flex-1 py-6 px-8 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                   activeTab === "calendar"
                     ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
                     : "text-slate-400 hover:text-white"
                 }`}
               >
-                📅 Calendar View
+                <CalendarDays className="w-5 h-5" />
+                Calendar View
               </button>
             </div>
           </div>
@@ -538,7 +542,8 @@ export default function AdminDashboard() {
                   {/* Admin Panel */}
                   <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-xl p-4 mb-6 backdrop-blur-sm">
                     <h3 className="text-orange-400 font-medium text-sm mb-2 flex items-center gap-2">
-                      🔧 Admin Controls
+                      <Plus className="w-4 h-4" />
+                      Admin Controls
                     </h3>
                     <p className="text-orange-300 text-xs">
                       You have full access to create, edit, and delete events.
@@ -710,7 +715,8 @@ export default function AdminDashboard() {
                   {/* Admin Panel */}
                   <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-xl p-4 mb-6 backdrop-blur-sm">
                     <h3 className="text-orange-400 font-medium text-sm mb-2 flex items-center gap-2">
-                      🔧 Admin Controls
+                      <Plus className="w-4 h-4" />
+                      Admin Controls
                     </h3>
                     <p className="text-orange-300 text-xs">
                       You have full access to create, edit, and delete events.

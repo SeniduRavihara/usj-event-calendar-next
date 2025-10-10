@@ -1,4 +1,5 @@
 "use client";
+import { ArrowRight, Eye, EyeOff, Lock, LogIn, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../components/AuthContext";
@@ -126,19 +127,7 @@ export default function LoginPage() {
 
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-600 rounded-3xl mb-6 shadow-2xl">
-              <svg
-                className="w-10 h-10 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
-                />
-              </svg>
+              <LogIn className="w-10 h-10 text-white" strokeWidth={2} />
             </div>
             <h1 className="text-4xl font-bold text-white mb-3">Welcome Back</h1>
             <p className="text-slate-400 text-lg">
@@ -164,25 +153,7 @@ export default function LoginPage() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <svg
-                    className="w-5 h-5 text-slate-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 7V4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v3"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 8 12 13l-9-5"
-                    />
-                  </svg>
+                  <Mail className="w-5 h-5 text-slate-400" strokeWidth={2} />
                 </div>
                 <input
                   id="email"
@@ -212,21 +183,7 @@ export default function LoginPage() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <svg
-                    className="w-5 h-5 text-slate-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <circle cx="12" cy="16" r="1" />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="m7 11V7a5 5 0 0 1 10 0v4"
-                    />
-                  </svg>
+                  <Lock className="w-5 h-5 text-slate-400" strokeWidth={2} />
                 </div>
                 <input
                   id="password"
@@ -247,31 +204,17 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center hover:bg-slate-600/20 rounded-r-2xl transition-colors"
                 >
-                  <svg
-                    className="w-5 h-5 text-slate-400 hover:text-slate-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    {showPassword ? (
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="m15 18-.722-3.25m-1.278 1.25L12 14m-3 4-.722-3.25M2 2l20 20"
-                      />
-                    ) : (
-                      <>
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                        />
-                        <circle cx="12" cy="12" r="3" />
-                      </>
-                    )}
-                  </svg>
+                  {showPassword ? (
+                    <EyeOff
+                      className="w-5 h-5 text-slate-400 hover:text-slate-300"
+                      strokeWidth={2}
+                    />
+                  ) : (
+                    <Eye
+                      className="w-5 h-5 text-slate-400 hover:text-slate-300"
+                      strokeWidth={2}
+                    />
+                  )}
                 </button>
               </div>
               {errors.password && (
@@ -334,14 +277,10 @@ export default function LoginPage() {
               ) : (
                 <>
                   Sign In
-                  <svg
+                  <ArrowRight
                     className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-200"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="m9 18 6-6-6-6"></path>
-                  </svg>
+                    strokeWidth={2}
+                  />
                 </>
               )}
             </button>

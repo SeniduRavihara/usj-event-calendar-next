@@ -1,5 +1,18 @@
 "use client";
 
+import {
+  Bell,
+  Calendar,
+  CalendarDays,
+  Filter,
+  List,
+  LogOut,
+  MapPin,
+  Plus,
+  Search,
+  User,
+  User as UserIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../components/AuthContext";
@@ -162,11 +175,12 @@ export default function Dashboard() {
   };
 
   const getEventIcon = (departments: any) => {
-    if (!departments || !Array.isArray(departments)) return "📅";
-    if (departments.includes("CS")) return "🤖";
-    if (departments.includes("SE")) return "🏗️";
-    if (departments.includes("IS")) return "🗃️";
-    return "📅";
+    if (!departments || !Array.isArray(departments))
+      return <Calendar className="w-5 h-5" />;
+    if (departments.includes("CS")) return <User className="w-5 h-5" />;
+    if (departments.includes("SE")) return <Plus className="w-5 h-5" />;
+    if (departments.includes("IS")) return <UserIcon className="w-5 h-5" />;
+    return <Calendar className="w-5 h-5" />;
   };
 
   const formatDate = (dateString: string) => {
@@ -792,7 +806,9 @@ export default function Dashboard() {
 
         <header className="header">
           <div className="logo-section">
-            <div className="logo">📅</div>
+            <div className="logo">
+              <Calendar className="w-6 h-6" />
+            </div>
             <Link href="/dashboard">
               <div className="logo-text">
                 <div className="logo-title">Faculty Events</div>
@@ -804,17 +820,22 @@ export default function Dashboard() {
           </div>
           <div className="header-actions">
             <Link href="/calendar" className="full-calendar-btn">
-              📅 Full Calendar
+              <Calendar className="w-4 h-4" />
+              Full Calendar
             </Link>
             <div className="notification-icon">
-              <Link href="/notifications">🔔</Link>
+              <Link href="/notifications">
+                <Bell className="w-4 h-4" />
+              </Link>
             </div>
             <div className="profile-icon">
-              <Link href="/profile">👤</Link>
+              <Link href="/profile">
+                <User className="w-4 h-4" />
+              </Link>
             </div>
             <button
               onClick={handleLogout}
-              className="logout-btn"
+              className="logout-btn flex items-center gap-2"
               style={{
                 background: "#ef4444",
                 color: "white",
@@ -826,6 +847,7 @@ export default function Dashboard() {
                 fontWeight: "500",
               }}
             >
+              <LogOut className="w-4 h-4" />
               Logout
             </button>
           </div>
@@ -850,21 +872,27 @@ export default function Dashboard() {
                 <h3>{getCurrentMonthEvents()}</h3>
                 <p>This month</p>
               </div>
-              <div className="stat-icon">📅</div>
+              <div className="stat-icon">
+                <Calendar className="w-5 h-5" />
+              </div>
             </div>
             <div className="stat-card registrations">
               <div className="stat-info">
                 <h3>{events.length}</h3>
                 <p>Total events</p>
               </div>
-              <div className="stat-icon">👥</div>
+              <div className="stat-icon">
+                <Plus className="w-5 h-5" />
+              </div>
             </div>
             <div className="stat-card department">
               <div className="stat-info">
                 <h3>{user?.department || "N/A"}</h3>
                 <p>{user?.student_id || "N/A"}</p>
               </div>
-              <div className="stat-icon">🎓</div>
+              <div className="stat-icon">
+                <UserIcon className="w-5 h-5" />
+              </div>
             </div>
           </div>
 
@@ -875,24 +903,26 @@ export default function Dashboard() {
                 <button
                   type="button"
                   onClick={() => setActiveTab("list")}
-                  className={`flex-1 py-6 px-8 rounded-xl font-medium transition-all duration-200 ${
+                  className={`flex-1 py-6 px-8 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                     activeTab === "list"
                       ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
                       : "text-slate-400 hover:text-white"
                   }`}
                 >
-                  📋 Events List
+                  <List className="w-5 h-5" />
+                  Events List
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab("calendar")}
-                  className={`flex-1 py-6 px-8 rounded-xl font-medium transition-all duration-200 ${
+                  className={`flex-1 py-6 px-8 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                     activeTab === "calendar"
                       ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
                       : "text-slate-400 hover:text-white"
                   }`}
                 >
-                  📅 Calendar View
+                  <CalendarDays className="w-5 h-5" />
+                  Calendar View
                 </button>
               </div>
             </div>
@@ -900,23 +930,29 @@ export default function Dashboard() {
             {activeTab === "list" ? (
               <section className="events-section">
                 <div className="search-filter">
-                  <input
-                    type="text"
-                    className="search-input"
-                    placeholder="Search events..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  <select
-                    className="filter-select"
-                    value={selectedDepartment}
-                    onChange={(e) => setSelectedDepartment(e.target.value)}
-                  >
-                    <option>All Departments</option>
-                    <option value="CS">Computer Science</option>
-                    <option value="SE">Software Engineering</option>
-                    <option value="IS">Information Systems</option>
-                  </select>
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input
+                      type="text"
+                      className="search-input pl-10"
+                      placeholder="Search events..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <div className="relative">
+                    <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <select
+                      className="filter-select pl-10"
+                      value={selectedDepartment}
+                      onChange={(e) => setSelectedDepartment(e.target.value)}
+                    >
+                      <option>All Departments</option>
+                      <option value="CS">Computer Science</option>
+                      <option value="SE">Software Engineering</option>
+                      <option value="IS">Information Systems</option>
+                    </select>
+                  </div>
                 </div>
 
                 <h2 className="section-title">Upcoming Events</h2>
@@ -966,11 +1002,18 @@ export default function Dashboard() {
                         </Link>
                         <p className="event-subtitle">{event.description}</p>
                         <div className="event-details">
-                          <span>
-                            📅 {formatDate(event.date)} at {event.time}
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {formatDate(event.date)} at {event.time}
                           </span>
-                          <span>📍 {event.location}</span>
-                          <span>👤 Created by {event.creator.name}</span>
+                          <span className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            {event.location}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <UserIcon className="w-3 h-3" />
+                            Created by {event.creator.name}
+                          </span>
                         </div>
                       </div>
                       <div className="event-actions">
