@@ -399,8 +399,8 @@ export default function AdminDashboard() {
         {/* Header */}
         <header className="bg-slate-800/80 backdrop-blur-xl border-b border-slate-700/50 px-4 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-lg font-semibold">
-              📅
+            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white">
+              <Calendar className="w-6 h-6" />
             </div>
             <div className="flex flex-col">
               <div className="text-base font-semibold text-white">
@@ -411,14 +411,7 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <a
-              href="/calendar"
-              className="hidden sm:flex items-center gap-2 text-slate-300 hover:text-white transition-colors text-sm"
-            >
-              <Calendar className="w-4 h-4" />
-              <span>Full Calendar</span>
-            </a>
+          <div className="flex items-center gap-3">
             <div className="relative">
               <div className="w-8 h-8 bg-slate-700/50 rounded-full flex items-center justify-center text-slate-300 hover:bg-slate-600/50 transition-colors cursor-pointer">
                 <Bell className="w-4 h-4" />

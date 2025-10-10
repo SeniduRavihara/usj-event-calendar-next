@@ -273,21 +273,7 @@ export default function Dashboard() {
           .header-actions {
             display: flex;
             align-items: center;
-            gap: 16px;
-          }
-
-          .full-calendar-btn {
-            color: #94a3b8;
-            text-decoration: none;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            transition: color 0.2s ease;
-          }
-
-          .full-calendar-btn:hover {
-            color: #f8fafc;
+            gap: 12px;
           }
 
           .notification-icon,
@@ -360,18 +346,18 @@ export default function Dashboard() {
 
           .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
           }
 
           .stat-card {
             background: rgba(30, 27, 75, 0.6);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(71, 85, 105, 0.3);
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -379,31 +365,30 @@ export default function Dashboard() {
           }
 
           .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
             border-color: rgba(139, 92, 246, 0.5);
           }
 
           .stat-info h3 {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 0.25rem;
           }
 
           .stat-info p {
             color: #94a3b8;
-            font-size: 14px;
+            font-size: 12px;
           }
 
           .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 20px;
           }
 
           .upcoming-events .stat-icon {
@@ -819,10 +804,6 @@ export default function Dashboard() {
             </Link>
           </div>
           <div className="header-actions">
-            <Link href="/calendar" className="full-calendar-btn">
-              <Calendar className="w-4 h-4" />
-              Full Calendar
-            </Link>
             <div className="notification-icon">
               <Link href="/notifications">
                 <Bell className="w-4 h-4" />
@@ -873,7 +854,7 @@ export default function Dashboard() {
                 <p>This month</p>
               </div>
               <div className="stat-icon">
-                <Calendar className="w-5 h-5" />
+                <Calendar className="w-4 h-4" />
               </div>
             </div>
             <div className="stat-card registrations">
@@ -882,7 +863,7 @@ export default function Dashboard() {
                 <p>Total events</p>
               </div>
               <div className="stat-icon">
-                <Plus className="w-5 h-5" />
+                <Plus className="w-4 h-4" />
               </div>
             </div>
             <div className="stat-card department">
@@ -891,7 +872,7 @@ export default function Dashboard() {
                 <p>{user?.student_id || "N/A"}</p>
               </div>
               <div className="stat-icon">
-                <UserIcon className="w-5 h-5" />
+                <UserIcon className="w-4 h-4" />
               </div>
             </div>
           </div>
