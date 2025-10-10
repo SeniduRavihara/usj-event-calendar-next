@@ -58,9 +58,11 @@ export default function AdminDashboard() {
   const { user, logout } = useAuth();
 
   // State management
+  const [activeTab, setActiveTab] = useState<"list" | "calendar">("list");
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
@@ -305,6 +307,51 @@ export default function AdminDashboard() {
 
   const departmentCounts = getDepartmentCounts();
 
+  // Calendar utility functions
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+
+    const days = [];
+
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+
+    // Add days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(new Date(year, month, day));
+    }
+
+    return days;
+  };
+
+  const getEventsForDate = (date: Date) => {
+    const dateString = date.toISOString().split("T")[0];
+    return events.filter((event) => {
+      if (!event.date) return false;
+      const eventDate = new Date(event.date).toISOString().split("T")[0];
+      return eventDate === dateString;
+    });
+  };
+
+  const navigateMonth = (direction: "prev" | "next") => {
+    setCurrentDate((prev) => {
+      const newDate = new Date(prev);
+      if (direction === "prev") {
+        newDate.setMonth(newDate.getMonth() - 1);
+      } else {
+        newDate.setMonth(newDate.getMonth() + 1);
+      }
+      return newDate;
+    });
+  };
+
   // Filter events
   const filteredEvents = events.filter((event) => {
     const matchesSearch =
@@ -454,181 +501,312 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+          {/* Tab Navigation */}
+          <div className="tab-navigation mt-8 mb-8">
+            <div className="flex bg-slate-700/50 rounded-2xl p-1">
+              <button
+                type="button"
+                onClick={() => setActiveTab("list")}
+                className={`flex-1 py-6 px-8 rounded-xl font-medium transition-all duration-200 ${
+                  activeTab === "list"
+                    ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                📋 Events List
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("calendar")}
+                className={`flex-1 py-6 px-8 rounded-xl font-medium transition-all duration-200 ${
+                  activeTab === "calendar"
+                    ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                📅 Calendar View
+              </button>
+            </div>
+          </div>
+
           {/* Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Events Section */}
             <div className="lg:col-span-2">
-              <section className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl">
-                {/* Admin Panel */}
-                <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-xl p-4 mb-6 backdrop-blur-sm">
-                  <h3 className="text-orange-400 font-medium text-sm mb-2 flex items-center gap-2">
-                    🔧 Admin Controls
-                  </h3>
-                  <p className="text-orange-300 text-xs">
-                    You have full access to create, edit, and delete events.
-                    Changes will be reflected immediately.
-                  </p>
-                </div>
-
-                {/* Create Button */}
-                <div className="flex justify-between items-center mb-6">
-                  <button
-                    onClick={openCreateModal}
-                    className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-6 py-3 rounded-xl font-medium transition-all hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/25"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Create Event
-                  </button>
-                </div>
-
-                {/* Search and Filter */}
-                <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      placeholder="Search events..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors bg-slate-700/50 text-white placeholder-slate-400"
-                    />
+              {activeTab === "list" ? (
+                <section className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl">
+                  {/* Admin Panel */}
+                  <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-xl p-4 mb-6 backdrop-blur-sm">
+                    <h3 className="text-orange-400 font-medium text-sm mb-2 flex items-center gap-2">
+                      🔧 Admin Controls
+                    </h3>
+                    <p className="text-orange-300 text-xs">
+                      You have full access to create, edit, and delete events.
+                      Changes will be reflected immediately.
+                    </p>
                   </div>
-                  <div className="relative">
-                    <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                    <select
-                      value={departmentFilter}
-                      onChange={(e) => setDepartmentFilter(e.target.value)}
-                      className="pl-10 pr-8 py-3 border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors bg-slate-700/50 text-white min-w-[200px]"
+
+                  {/* Create Button */}
+                  <div className="flex justify-between items-center mb-6">
+                    <button
+                      onClick={openCreateModal}
+                      className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-6 py-3 rounded-xl font-medium transition-all hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/25"
                     >
-                      <option value="all">All Departments</option>
-                      <option value="cs">Computer Science</option>
-                      <option value="se">Software Engineering</option>
-                      <option value="is">Information Systems</option>
-                    </select>
+                      <Plus className="w-4 h-4" />
+                      Create Event
+                    </button>
                   </div>
-                </div>
 
-                <h2 className="text-xl font-semibold text-white mb-6">
-                  Upcoming Events
-                </h2>
-
-                {/* Events List */}
-                <div className="space-y-4">
-                  {loading ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                      <p className="mt-4 text-slate-400">Loading events...</p>
+                  {/* Search and Filter */}
+                  <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                      <input
+                        type="text"
+                        placeholder="Search events..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors bg-slate-700/50 text-white placeholder-slate-400"
+                      />
                     </div>
-                  ) : error ? (
-                    <div className="text-center py-8">
-                      <p className="text-red-600">{error}</p>
-                      <button
-                        onClick={() => window.location.reload()}
-                        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    <div className="relative">
+                      <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                      <select
+                        value={departmentFilter}
+                        onChange={(e) => setDepartmentFilter(e.target.value)}
+                        className="pl-10 pr-8 py-3 border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors bg-slate-700/50 text-white min-w-[200px]"
                       >
-                        Retry
-                      </button>
+                        <option value="all">All Departments</option>
+                        <option value="cs">Computer Science</option>
+                        <option value="se">Software Engineering</option>
+                        <option value="is">Information Systems</option>
+                      </select>
                     </div>
-                  ) : filteredEvents.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-slate-400">No events found.</p>
-                    </div>
-                  ) : (
-                    filteredEvents.map((event) => {
-                      const departmentInfo = getDepartmentInfo(
-                        event.departments
-                      );
+                  </div>
+
+                  <h2 className="text-xl font-semibold text-white mb-6">
+                    Upcoming Events
+                  </h2>
+
+                  {/* Events List */}
+                  <div className="space-y-4">
+                    {loading ? (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                        <p className="mt-4 text-slate-400">Loading events...</p>
+                      </div>
+                    ) : error ? (
+                      <div className="text-center py-8">
+                        <p className="text-red-600">{error}</p>
+                        <button
+                          onClick={() => window.location.reload()}
+                          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        >
+                          Retry
+                        </button>
+                      </div>
+                    ) : filteredEvents.length === 0 ? (
+                      <div className="text-center py-8">
+                        <p className="text-slate-400">No events found.</p>
+                      </div>
+                    ) : (
+                      filteredEvents.map((event) => {
+                        const departmentInfo = getDepartmentInfo(
+                          event.departments
+                        );
+
+                        return (
+                          <div
+                            key={event.id}
+                            className="bg-slate-700/50 border border-slate-600/50 rounded-2xl p-6 hover:shadow-lg hover:border-purple-500/50 hover:-translate-y-1 transition-all duration-200 backdrop-blur-sm"
+                          >
+                            <div className="flex items-start gap-4">
+                              <div className="w-12 h-12 bg-slate-600/50 rounded-xl flex items-center justify-center text-xl flex-shrink-0 border border-slate-500/50">
+                                {departmentInfo.icon}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <h3 className="text-lg font-semibold text-white truncate">
+                                    {event.title}
+                                  </h3>
+                                  <span
+                                    className={`${departmentInfo.color} text-white text-xs font-medium px-2 py-1 rounded-full`}
+                                  >
+                                    {departmentInfo.name}
+                                  </span>
+                                </div>
+                                <p className="text-slate-300 text-sm mb-3">
+                                  {event.description}
+                                </p>
+                                <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400 mb-4">
+                                  <div className="flex items-center gap-1">
+                                    <Calendar className="w-4 h-4" />
+                                    <span>
+                                      {formatDate(event.date)} at{" "}
+                                      {event.time || "No time set"}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <MapPin className="w-4 h-4" />
+                                    <span>{event.location}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Users className="w-4 h-4" />
+                                    <span>Created by {event.creator.name}</span>
+                                  </div>
+                                </div>
+                                {event.registration_needed && (
+                                  <div className="mb-4">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-xs text-gray-600">
+                                        Registration Required
+                                      </span>
+                                      {event.registration_link && (
+                                        <a
+                                          href={event.registration_link}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-xs text-blue-600 hover:text-blue-800 underline"
+                                        >
+                                          Register Here
+                                        </a>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100">
+                              <button
+                                onClick={() => viewEvent(event)}
+                                className="flex items-center gap-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-all hover:-translate-y-1"
+                              >
+                                <Eye className="w-4 h-4" />
+                                View Details
+                              </button>
+                              <button
+                                onClick={() => openEditModal(event)}
+                                className="flex items-center gap-1 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium transition-all hover:-translate-y-1"
+                              >
+                                <Edit className="w-4 h-4" />
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => deleteEvent(event.id)}
+                                className="flex items-center gap-1 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-all hover:-translate-y-1"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </section>
+              ) : (
+                <section className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl">
+                  {/* Admin Panel */}
+                  <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-xl p-4 mb-6 backdrop-blur-sm">
+                    <h3 className="text-orange-400 font-medium text-sm mb-2 flex items-center gap-2">
+                      🔧 Admin Controls
+                    </h3>
+                    <p className="text-orange-300 text-xs">
+                      You have full access to create, edit, and delete events.
+                      Changes will be reflected immediately.
+                    </p>
+                  </div>
+
+                  {/* Calendar Header */}
+                  <div className="flex items-center justify-between mb-6">
+                    <button
+                      onClick={() => navigateMonth("prev")}
+                      className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 hover:text-white transition-colors"
+                    >
+                      ←
+                    </button>
+                    <h2 className="text-xl font-semibold text-white">
+                      {currentDate.toLocaleDateString("en-US", {
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </h2>
+                    <button
+                      onClick={() => navigateMonth("next")}
+                      className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 hover:text-white transition-colors"
+                    >
+                      →
+                    </button>
+                  </div>
+
+                  {/* Calendar Grid */}
+                  <div className="grid grid-cols-7 gap-1 bg-slate-700/30 rounded-xl p-2">
+                    {/* Day headers */}
+                    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                      (day) => (
+                        <div
+                          key={day}
+                          className="p-2 text-center text-sm font-medium text-slate-400"
+                        >
+                          {day}
+                        </div>
+                      )
+                    )}
+
+                    {/* Calendar days */}
+                    {getDaysInMonth(currentDate).map((day, index) => {
+                      if (!day) {
+                        return <div key={index} className="p-2"></div>;
+                      }
+
+                      const dayEvents = getEventsForDate(day);
+                      const isToday =
+                        day.toDateString() === new Date().toDateString();
+                      const isCurrentMonth =
+                        day.getMonth() === currentDate.getMonth();
 
                       return (
                         <div
-                          key={event.id}
-                          className="bg-slate-700/50 border border-slate-600/50 rounded-2xl p-6 hover:shadow-lg hover:border-purple-500/50 hover:-translate-y-1 transition-all duration-200 backdrop-blur-sm"
+                          key={index}
+                          className={`p-2 min-h-[100px] border border-slate-600/30 rounded-lg ${
+                            isToday
+                              ? "bg-purple-500/20 border-purple-500/50"
+                              : ""
+                          } ${!isCurrentMonth ? "opacity-50" : ""}`}
                         >
-                          <div className="flex items-start gap-4">
-                            <div className="w-12 h-12 bg-slate-600/50 rounded-xl flex items-center justify-center text-xl flex-shrink-0 border border-slate-500/50">
-                              {departmentInfo.icon}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-3 mb-2">
-                                <h3 className="text-lg font-semibold text-white truncate">
-                                  {event.title}
-                                </h3>
-                                <span
-                                  className={`${departmentInfo.color} text-white text-xs font-medium px-2 py-1 rounded-full`}
-                                >
-                                  {departmentInfo.name}
-                                </span>
-                              </div>
-                              <p className="text-slate-300 text-sm mb-3">
-                                {event.description}
-                              </p>
-                              <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400 mb-4">
-                                <div className="flex items-center gap-1">
-                                  <Calendar className="w-4 h-4" />
-                                  <span>
-                                    {formatDate(event.date)} at{" "}
-                                    {event.time || "No time set"}
-                                  </span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <MapPin className="w-4 h-4" />
-                                  <span>{event.location}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Users className="w-4 h-4" />
-                                  <span>Created by {event.creator.name}</span>
-                                </div>
-                              </div>
-                              {event.registration_needed && (
-                                <div className="mb-4">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-xs text-gray-600">
-                                      Registration Required
-                                    </span>
-                                    {event.registration_link && (
-                                      <a
-                                        href={event.registration_link}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-xs text-blue-600 hover:text-blue-800 underline"
-                                      >
-                                        Register Here
-                                      </a>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
+                          <div
+                            className={`text-sm font-medium mb-1 ${
+                              isToday ? "text-purple-400" : "text-slate-300"
+                            }`}
+                          >
+                            {day.getDate()}
                           </div>
-                          <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100">
-                            <button
-                              onClick={() => viewEvent(event)}
-                              className="flex items-center gap-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-all hover:-translate-y-1"
-                            >
-                              <Eye className="w-4 h-4" />
-                              View Details
-                            </button>
-                            <button
-                              onClick={() => openEditModal(event)}
-                              className="flex items-center gap-1 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium transition-all hover:-translate-y-1"
-                            >
-                              <Edit className="w-4 h-4" />
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => deleteEvent(event.id)}
-                              className="flex items-center gap-1 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-all hover:-translate-y-1"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                              Delete
-                            </button>
+                          <div className="space-y-1">
+                            {dayEvents.slice(0, 2).map((event, eventIndex) => (
+                              <div
+                                key={eventIndex}
+                                className="text-xs p-1 rounded bg-blue-500/80 text-white truncate cursor-pointer hover:bg-blue-500 transition-colors"
+                                title={event.title}
+                                onClick={() => openEditModal(event)}
+                              >
+                                {event.title.length > 12
+                                  ? event.title.substring(0, 12) + "..."
+                                  : event.title}
+                              </div>
+                            ))}
+                            {dayEvents.length > 2 && (
+                              <div className="text-xs text-slate-400 text-center">
+                                +{dayEvents.length - 2} more
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
-                    })
-                  )}
-                </div>
-              </section>
+                    })}
+                  </div>
+                </section>
+              )}
             </div>
 
             {/* Sidebar */}
@@ -915,6 +1093,22 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+
+      <style jsx>{`
+        /* Tab Navigation Styles */
+        .tab-navigation {
+          margin-top: 2rem !important;
+          margin-bottom: 2rem !important;
+        }
+
+        .tab-navigation button {
+          padding: 0.75rem 1.5rem !important;
+          min-height: 48px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+      `}</style>
     </ProtectedRoute>
   );
 }
