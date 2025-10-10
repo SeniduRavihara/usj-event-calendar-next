@@ -251,19 +251,39 @@ export default function AdminDashboard() {
       !Array.isArray(departments) ||
       departments.length === 0
     ) {
-      return { name: "ALL", color: "bg-gray-500", icon: "📋" };
+      return {
+        name: "ALL",
+        color: "bg-gray-500",
+        icon: <Calendar className="w-5 h-5" />,
+      };
     }
 
     const dept = departments[0]; // Use first department for display
     switch (dept) {
       case "CS":
-        return { name: "CS", color: "bg-blue-500", icon: "🤖" };
+        return {
+          name: "CS",
+          color: "bg-blue-500",
+          icon: <Calendar className="w-5 h-5" />,
+        };
       case "SE":
-        return { name: "SE", color: "bg-emerald-500", icon: "🏗️" };
+        return {
+          name: "SE",
+          color: "bg-emerald-500",
+          icon: <Calendar className="w-5 h-5" />,
+        };
       case "IS":
-        return { name: "IS", color: "bg-purple-500", icon: "🗃️" };
+        return {
+          name: "IS",
+          color: "bg-purple-500",
+          icon: <Calendar className="w-5 h-5" />,
+        };
       default:
-        return { name: dept, color: "bg-gray-500", icon: "📋" };
+        return {
+          name: dept,
+          color: "bg-gray-500",
+          icon: <Calendar className="w-5 h-5" />,
+        };
     }
   };
 
@@ -619,7 +639,7 @@ export default function AdminDashboard() {
                             className="bg-slate-700/50 border border-slate-600/50 rounded-2xl p-6 hover:shadow-lg hover:border-purple-500/50 hover:-translate-y-1 transition-all duration-200 backdrop-blur-sm"
                           >
                             <div className="flex items-start gap-4">
-                              <div className="w-12 h-12 bg-slate-600/50 rounded-xl flex items-center justify-center text-xl flex-shrink-0 border border-slate-500/50">
+                              <div className="w-12 h-12 bg-slate-600/50 rounded-xl flex items-center justify-center text-slate-400 flex-shrink-0 border border-slate-500/50">
                                 {departmentInfo.icon}
                               </div>
                               <div className="flex-1 min-w-0">
