@@ -10,6 +10,7 @@ export interface UserPayload {
   email: string;
   role: string;
   name: string;
+  student_id?: string | null;
 }
 
 export async function hashPassword(password: string) {

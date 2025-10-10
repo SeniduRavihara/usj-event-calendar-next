@@ -24,7 +24,7 @@ interface Event {
   date: string;
   time: string;
   location: string;
-  departments: any;
+  departments: string[] | null;
   registration_needed: boolean;
   registration_link?: string;
   cover_color?: string;
@@ -160,7 +160,7 @@ export default function Dashboard() {
     }
   };
 
-  const getEventIcon = (departments: any) => {
+  const getEventIcon = (departments: string[] | null) => {
     if (!departments || !Array.isArray(departments))
       return <Calendar className="w-5 h-5" />;
     if (departments.includes("CS")) return <User className="w-5 h-5" />;

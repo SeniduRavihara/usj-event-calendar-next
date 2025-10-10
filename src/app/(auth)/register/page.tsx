@@ -115,12 +115,12 @@ export default function SignupPage() {
     if (/[^a-zA-Z\d]/.test(password)) strength++;
 
     const strengthMap = {
-      0: { text: "Very Weak", color: "bg-red-500" },
-      1: { text: "Weak", color: "bg-red-400" },
-      2: { text: "Fair", color: "bg-yellow-500" },
-      3: { text: "Good", color: "bg-blue-500" },
-      4: { text: "Strong", color: "bg-green-500" },
-      5: { text: "Very Strong", color: "bg-green-600" },
+      0: { strength: 0, text: "Very Weak", color: "bg-red-500" },
+      1: { strength: 1, text: "Weak", color: "bg-red-400" },
+      2: { strength: 2, text: "Fair", color: "bg-yellow-500" },
+      3: { strength: 3, text: "Good", color: "bg-blue-500" },
+      4: { strength: 4, text: "Strong", color: "bg-green-500" },
+      5: { strength: 5, text: "Very Strong", color: "bg-green-600" },
     };
 
     return strengthMap[strength as keyof typeof strengthMap];
@@ -160,7 +160,7 @@ export default function SignupPage() {
       } else {
         setErrors({ api: data.error || "Registration failed" });
       }
-    } catch (error) {
+    } catch {
       setErrors({ api: "Network error. Please try again." });
     } finally {
       setIsLoading(false);

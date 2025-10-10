@@ -29,7 +29,7 @@ interface Event {
   date: string;
   time: string;
   location: string;
-  departments: any;
+  departments: string[] | null;
   registration_needed: boolean;
   registration_link?: string;
   cover_color?: string;
@@ -245,7 +245,7 @@ export default function AdminDashboard() {
   };
 
   // Utility functions
-  const getDepartmentInfo = (departments: any) => {
+  const getDepartmentInfo = (departments: string[] | null) => {
     if (
       !departments ||
       !Array.isArray(departments) ||
@@ -295,20 +295,6 @@ export default function AdminDashboard() {
       year: "numeric",
       month: "short",
       day: "numeric",
-    });
-  };
-
-  const formatTime = (timeString: string) => {
-    if (!timeString || timeString.trim() === "") {
-      return "No time set";
-    }
-    const [hours, minutes] = timeString.split(":");
-    const date = new Date();
-    date.setHours(parseInt(hours), parseInt(minutes));
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
     });
   };
 

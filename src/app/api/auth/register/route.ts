@@ -108,10 +108,10 @@ export async function POST(req: Request) {
     );
   } catch (err) {
     console.error("💥 Registration error details:", {
-      name: err.name,
-      message: err.message,
-      stack: err.stack,
-      cause: err.cause,
+      name: (err as Error).name,
+      message: (err as Error).message,
+      stack: (err as Error).stack,
+      cause: (err as Error).cause,
     });
     return NextResponse.json(
       { error: "Internal server error" },

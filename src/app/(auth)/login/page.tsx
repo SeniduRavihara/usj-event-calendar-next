@@ -98,12 +98,13 @@ export default function LoginPage() {
 
       if (result.success) {
         // Redirect based on role
-        const redirectUrl = user?.role === "ADMIN" ? "/admin" : "/dashboard";
+        const redirectUrl =
+          result.user?.role === "ADMIN" ? "/admin" : "/dashboard";
         router.push(redirectUrl);
       } else {
         setErrors({ api: result.error || "Login failed" });
       }
-    } catch (error) {
+    } catch {
       setErrors({ api: "Network error. Please try again." });
     } finally {
       setIsLoading(false);
@@ -288,7 +289,7 @@ export default function LoginPage() {
 
           {/* Sign Up Link */}
           <p className="mt-8 text-center text-sm text-slate-400">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <a
               href="/register"
               className="font-semibold text-purple-400 hover:text-purple-300 transition-colors"
