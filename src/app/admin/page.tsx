@@ -502,7 +502,7 @@ export default function AdminDashboard() {
               <button
                 type="button"
                 onClick={() => setActiveTab("list")}
-                className={`flex-1 py-6 px-8 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                   activeTab === "list"
                     ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
                     : "text-slate-400 hover:text-white"
@@ -514,7 +514,7 @@ export default function AdminDashboard() {
               <button
                 type="button"
                 onClick={() => setActiveTab("calendar")}
-                className={`flex-1 py-6 px-8 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                   activeTab === "calendar"
                     ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
                     : "text-slate-400 hover:text-white"
