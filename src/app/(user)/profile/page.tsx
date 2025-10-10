@@ -1,5 +1,16 @@
 "use client";
 
+import {
+  ArrowLeft,
+  Building2,
+  GraduationCap,
+  LogOut,
+  Mail,
+  Save,
+  User,
+  User as UserIcon,
+} from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../components/AuthContext";
 import { ProtectedRoute } from "../../../components/ProtectedRoute";
@@ -83,131 +94,160 @@ export default function ProfilePage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-[#e0f2f7] to-[#c5e1ed] text-gray-800">
-        <div className="w-full max-w-xl flex justify-between items-center px-6 py-4">
-          <a
-            href="/dashboard"
-            className="bg-white text-blue-500 px-4 py-2 rounded-xl shadow-md hover:bg-blue-50 font-semibold flex items-center gap-2"
-          >
-            ← Dashboard
-          </a>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">👤</span>
-            <span className="font-bold text-lg">My Profile</span>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded-xl shadow-md hover:bg-red-600 font-semibold"
-          >
-            Logout
-          </button>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-xl p-8 mt-8 w-full max-w-md flex flex-col items-center">
-          <h2 className="text-2xl font-bold mb-6">Edit Profile</h2>
-
-          <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
-            <div className="flex flex-col">
-              <label
-                htmlFor="name"
-                className="font-semibold text-sm text-gray-600"
-              >
-                Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 outline-none bg-white text-gray-900"
-              />
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-slate-100">
+        <header className="bg-slate-800/80 backdrop-blur-xl border-b border-slate-700/50 px-4 lg:px-8 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+              <UserIcon className="w-6 h-6" />
             </div>
-
-            <div className="flex flex-col">
-              <label
-                htmlFor="email"
-                className="font-semibold text-sm text-gray-600"
-              >
-                Email Address
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 outline-none bg-white text-gray-900"
-              />
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex flex-col flex-1">
-                <label
-                  htmlFor="department"
-                  className="font-semibold text-sm text-gray-600"
-                >
-                  Department
-                </label>
-                <select
-                  id="department"
-                  name="department"
-                  value={form.department}
-                  onChange={handleChange}
-                  className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 outline-none bg-white text-gray-900"
-                >
-                  <option value="">Select department</option>
-                  <option value="Computer Science">Computer Science</option>
-                  <option value="Software Engineering">
-                    Software Engineering
-                  </option>
-                  <option value="Information Systems">
-                    Information Systems
-                  </option>
-                </select>
+            <Link href="/dashboard">
+              <div className="flex flex-col">
+                <div className="text-base font-semibold text-white">
+                  Faculty Events
+                </div>
+                <div className="text-xs text-slate-300 hidden sm:block">
+                  University of Sri Jayewardenepura
+                </div>
               </div>
+            </Link>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 text-white font-medium text-sm shadow-lg hover:shadow-purple-500/25 hover:from-purple-600 hover:to-pink-700 transition-all duration-200 whitespace-nowrap w-48 h-11"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Dashboard
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </button>
+          </div>
+        </header>
 
-              <div className="flex flex-col flex-1">
+        <main className="max-w-4xl mx-auto px-4 lg:px-8 py-8">
+          <section className="mb-8 text-center">
+            <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
+              <User className="w-8 h-8" />
+              My Profile
+            </h1>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+              Manage your personal information and account settings
+            </p>
+          </section>
+
+          <div className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-8 shadow-2xl">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
                 <label
-                  htmlFor="student_id"
-                  className="font-semibold text-sm text-gray-600"
+                  htmlFor="name"
+                  className="block text-sm font-semibold text-white mb-2"
                 >
-                  Student ID
+                  <User className="w-4 h-4 inline mr-2" />
+                  Full Name
                 </label>
                 <input
-                  id="student_id"
-                  name="student_id"
-                  value={form.student_id}
+                  id="name"
+                  name="name"
+                  type="text"
+                  value={form.name}
                   onChange={handleChange}
-                  className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 outline-none bg-white text-gray-900"
+                  className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                  placeholder="Enter your full name"
+                  required
                 />
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className={`mt-4 py-3 rounded-xl text-white font-bold transition-all shadow-md ${
-                loading
-                  ? "bg-gradient-to-r from-blue-300 to-purple-300 cursor-not-allowed"
-                  : "bg-gradient-to-r from-blue-500 to-purple-600 hover:shadow-lg"
-              }`}
-            >
-              {loading ? "Saving..." : "Save Changes"}
-            </button>
-          </form>
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-semibold text-white mb-2"
+                >
+                  <Mail className="w-4 h-4 inline mr-2" />
+                  Email Address
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                  placeholder="Enter your email address"
+                  required
+                />
+              </div>
 
-          {msg && (
-            <div
-              className={`mt-4 p-3 rounded-lg font-semibold text-center border ${
-                msg.type === "success"
-                  ? "bg-green-50 text-green-700 border-green-700"
-                  : "bg-red-50 text-red-700 border-red-700"
-              }`}
-            >
-              {msg.text}
-            </div>
-          )}
-        </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label
+                    htmlFor="department"
+                    className="block text-sm font-semibold text-white mb-2"
+                  >
+                    <Building2 className="w-4 h-4 inline mr-2" />
+                    Department
+                  </label>
+                  <select
+                    id="department"
+                    name="department"
+                    value={form.department}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                  >
+                    <option value="">Select department</option>
+                    <option value="CS">Computer Science</option>
+                    <option value="SE">Software Engineering</option>
+                    <option value="IS">Information Systems</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="student_id"
+                    className="block text-sm font-semibold text-white mb-2"
+                  >
+                    <GraduationCap className="w-4 h-4 inline mr-2" />
+                    Student ID
+                  </label>
+                  <input
+                    id="student_id"
+                    name="student_id"
+                    type="text"
+                    value={form.student_id}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                    placeholder="Enter your student ID"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-purple-500/25 hover:from-purple-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-800 transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                <Save className="w-5 h-5" />
+                {loading ? "Saving..." : "Save Changes"}
+              </button>
+            </form>
+
+            {msg && (
+              <div
+                className={`mt-6 p-4 rounded-xl font-medium text-center ${
+                  msg.type === "success"
+                    ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                    : "bg-red-500/10 text-red-400 border border-red-500/20"
+                }`}
+              >
+                {msg.text}
+              </div>
+            )}
+          </div>
+        </main>
       </div>
     </ProtectedRoute>
   );

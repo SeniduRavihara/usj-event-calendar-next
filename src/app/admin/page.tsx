@@ -497,7 +497,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Tab Navigation */}
-          <div className="tab-navigation mt-8 mb-8">
+          <div className="mt-8 mb-8">
             <div className="flex bg-slate-700/50 rounded-2xl p-1">
               <button
                 type="button"
@@ -1092,22 +1092,6 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
-
-      <style jsx>{`
-        /* Tab Navigation Styles */
-        .tab-navigation {
-          margin-top: 2rem !important;
-          margin-bottom: 2rem !important;
-        }
-
-        .tab-navigation button {
-          padding: 0.75rem 1.5rem !important;
-          min-height: 48px !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-        }
-      `}</style>
     </ProtectedRoute>
   );
 }
