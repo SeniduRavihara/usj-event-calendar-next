@@ -47,8 +47,21 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const { name, email, department, student_id } = body;
 
+    // Get current user data from database to compare with existing values
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userPayload.userId },
+      select: {
+        email: true,
+        student_id: true,
+      },
+    });
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     // Check if email is being changed and if it already exists
-    if (email && email !== userPayload.email) {
+    if (email && email !== currentUser.email) {
       const existingUser = await prisma.user.findUnique({
         where: { email },
       });
@@ -61,7 +74,8 @@ export async function PUT(req: NextRequest) {
     }
 
     // Check if student_id is being changed and if it already exists
-    if (student_id && student_id !== userPayload.student_id) {
+    // Only check if student_id is provided and different from current value
+    if (student_id && student_id !== currentUser.student_id) {
       const existingStudent = await prisma.user.findUnique({
         where: { student_id },
       });
@@ -73,14 +87,21 @@ export async function PUT(req: NextRequest) {
       }
     }
 
+    // Prepare update data - only include fields that are provided
+    const updateData: {
+      name?: string;
+      email?: string;
+      department?: string;
+      student_id?: string | null;
+    } = {};
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (department !== undefined) updateData.department = department;
+    if (student_id !== undefined) updateData.student_id = student_id || null;
+
     const updatedUser = await prisma.user.update({
       where: { id: userPayload.userId },
-      data: {
-        name: name || undefined,
-        email: email || undefined,
-        department: department || undefined,
-        student_id: student_id || undefined,
-      },
+      data: updateData,
       select: {
         id: true,
         name: true,

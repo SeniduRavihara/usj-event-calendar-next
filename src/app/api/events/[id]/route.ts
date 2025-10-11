@@ -38,7 +38,28 @@ export async function GET(
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ event });
+    // Format event for frontend
+    const formattedEvent = {
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      date: event.event_date?.toISOString().split("T")[0] || "",
+      time: event.event_time
+        ? event.event_time.toISOString().split("T")[1].substring(0, 5)
+        : "",
+      location: event.location,
+      departments: event.departments,
+      registration_needed: event.registration_needed,
+      registration_link: event.registration_link,
+      cover_image: event.cover_image,
+      cover_color: event.cover_color,
+      created_by: event.created_by,
+      creator: event.creator,
+      created_at: event.created_at,
+      updated_at: event.updated_at,
+    };
+
+    return NextResponse.json({ event: formattedEvent });
   } catch (err) {
     console.error("Error fetching event:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
@@ -127,9 +148,30 @@ export async function PUT(
       },
     });
 
+    // Format event for frontend
+    const formattedEvent = {
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      date: event.event_date?.toISOString().split("T")[0] || "",
+      time: event.event_time
+        ? event.event_time.toISOString().split("T")[1].substring(0, 5)
+        : "",
+      location: event.location,
+      departments: event.departments,
+      registration_needed: event.registration_needed,
+      registration_link: event.registration_link,
+      cover_image: event.cover_image,
+      cover_color: event.cover_color,
+      created_by: event.created_by,
+      creator: event.creator,
+      created_at: event.created_at,
+      updated_at: event.updated_at,
+    };
+
     return NextResponse.json({
       message: "Event updated successfully",
-      event,
+      event: formattedEvent,
     });
   } catch (err) {
     console.error("Error updating event:", err);

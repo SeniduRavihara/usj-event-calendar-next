@@ -31,6 +31,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (user) {
+      console.log("User data:", user); // Debug log
       setForm({
         name: user.name || "",
         email: user.email || "",
@@ -45,6 +46,11 @@ export default function ProfilePage() {
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
+  // Debug log for form state
+  useEffect(() => {
+    console.log("Form state:", form);
+  }, [form]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -194,14 +200,18 @@ export default function ProfilePage() {
                   <select
                     id="department"
                     name="department"
-                    value={form.department}
+                    value={form.department || ""}
                     onChange={handleChange}
                     className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
                   >
                     <option value="">Select department</option>
-                    <option value="CS">Computer Science</option>
-                    <option value="SE">Software Engineering</option>
-                    <option value="IS">Information Systems</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Software Engineering">
+                      Software Engineering
+                    </option>
+                    <option value="Information Systems">
+                      Information Systems
+                    </option>
                   </select>
                 </div>
 

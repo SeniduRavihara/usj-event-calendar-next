@@ -60,7 +60,9 @@ export default function AdminDashboard() {
   const { user, logout } = useAuth();
 
   // State management
-  const [activeTab, setActiveTab] = useState<"list" | "calendar">("list");
+  const [activeTab, setActiveTab] = useState<"list" | "calendar" | "analytics">(
+    "list"
+  );
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,6 +73,11 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
+  const [deletingEventId, setDeletingEventId] = useState<number | null>(null);
+
+  // Analytics state
+  const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   const [formData, setFormData] = useState<EventFormData>({
     title: "",
@@ -108,6 +115,32 @@ export default function AdminDashboard() {
     fetchEvents();
   }, []);
 
+  // Fetch analytics data
+  const fetchAnalytics = async () => {
+    try {
+      setAnalyticsLoading(true);
+      const response = await fetch("/api/analytics/users", {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch analytics");
+      }
+      const data = await response.json();
+      setAnalyticsData(data);
+    } catch (err) {
+      console.error("Error fetching analytics:", err);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
+
+  // Fetch analytics when analytics tab is selected
+  useEffect(() => {
+    if (activeTab === "analytics" && !analyticsData) {
+      fetchAnalytics();
+    }
+  }, [activeTab, analyticsData]);
+
   // Notification system
   const [notifications, setNotifications] = useState<
     Array<{ id: string; message: string; type: "success" | "error" }>
@@ -142,6 +175,8 @@ export default function AdminDashboard() {
   };
 
   const openEditModal = (event: Event) => {
+    console.log("Opening edit modal for event:", event);
+    console.log("Event date:", event.date, "Event time:", event.time);
     setEditingEvent(event);
     setFormData({
       title: event.title,
@@ -153,6 +188,11 @@ export default function AdminDashboard() {
       registration_needed: event.registration_needed,
       registration_link: event.registration_link || "",
       cover_color: event.cover_color || "#3b82f6",
+    });
+    console.log("Form data set to:", {
+      title: event.title,
+      date: event.date,
+      time: event.time,
     });
     setIsModalOpen(true);
   };
@@ -172,6 +212,8 @@ export default function AdminDashboard() {
         : "/api/events";
       const method = editingEvent ? "PUT" : "POST";
 
+      console.log("Submitting event:", { editingEvent, formData, url, method });
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -184,11 +226,18 @@ export default function AdminDashboard() {
         }),
       });
 
+      console.log("Response status:", response.status);
+
       if (!response.ok) {
-        throw new Error("Failed to save event");
+        const errorData = await response.json();
+        console.error("Error response:", errorData);
+        throw new Error(
+          `Failed to save event: ${errorData.error || "Unknown error"}`
+        );
       }
 
       const data = await response.json();
+      console.log("Success response:", data);
 
       if (editingEvent) {
         // Update existing event in state
@@ -207,33 +256,45 @@ export default function AdminDashboard() {
       closeModal();
     } catch (err) {
       console.error("Error saving event:", err);
-      showNotification("Failed to save event", "error");
+      showNotification(`Failed to save event: ${err.message}`, "error");
     } finally {
       setIsLoading(false);
     }
   };
 
   const deleteEvent = async (id: number) => {
+    console.log("Attempting to delete event with ID:", id);
     if (
       confirm(
         "Are you sure you want to delete this event? This action cannot be undone."
       )
     ) {
+      setDeletingEventId(id);
       try {
+        console.log("Sending DELETE request to:", `/api/events/${id}`);
         const response = await fetch(`/api/events/${id}`, {
           method: "DELETE",
           credentials: "include",
         });
 
+        console.log("Delete response status:", response.status);
+
         if (!response.ok) {
-          throw new Error("Failed to delete event");
+          const errorData = await response.json();
+          console.error("Delete error response:", errorData);
+          throw new Error(
+            `Failed to delete event: ${errorData.error || "Unknown error"}`
+          );
         }
 
         setEvents((prev) => prev.filter((event) => event.id !== id));
         showNotification("Event deleted successfully!");
+        console.log("Event deleted successfully from state");
       } catch (err) {
         console.error("Error deleting event:", err);
-        showNotification("Failed to delete event", "error");
+        showNotification(`Failed to delete event: ${err.message}`, "error");
+      } finally {
+        setDeletingEventId(null);
       }
     }
   };
@@ -260,19 +321,19 @@ export default function AdminDashboard() {
 
     const dept = departments[0]; // Use first department for display
     switch (dept) {
-      case "CS":
+      case "Computer Science":
         return {
           name: "CS",
           color: "bg-blue-500",
           icon: <Calendar className="w-5 h-5" />,
         };
-      case "SE":
+      case "Software Engineering":
         return {
           name: "SE",
           color: "bg-emerald-500",
           icon: <Calendar className="w-5 h-5" />,
         };
-      case "IS":
+      case "Information Systems":
         return {
           name: "IS",
           color: "bg-purple-500",
@@ -529,6 +590,18 @@ export default function AdminDashboard() {
                 <CalendarDays className="w-5 h-5" />
                 Calendar View
               </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("analytics")}
+                className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                  activeTab === "analytics"
+                    ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                <Users className="w-5 h-5" />
+                Analytics
+              </button>
             </div>
           </div>
 
@@ -581,9 +654,15 @@ export default function AdminDashboard() {
                         className="pl-10 pr-8 py-3 border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors bg-slate-700/50 text-white min-w-[200px]"
                       >
                         <option value="all">All Departments</option>
-                        <option value="cs">Computer Science</option>
-                        <option value="se">Software Engineering</option>
-                        <option value="is">Information Systems</option>
+                        <option value="Computer Science">
+                          Computer Science
+                        </option>
+                        <option value="Software Engineering">
+                          Software Engineering
+                        </option>
+                        <option value="Information Systems">
+                          Information Systems
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -690,17 +769,30 @@ export default function AdminDashboard() {
                               </button>
                               <button
                                 onClick={() => openEditModal(event)}
-                                className="flex items-center gap-1 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium transition-all hover:-translate-y-1"
+                                className="flex items-center gap-1 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium transition-all hover:-translate-y-1 hover:shadow-lg"
+                                title="Edit this event"
                               >
                                 <Edit className="w-4 h-4" />
                                 Edit
                               </button>
                               <button
                                 onClick={() => deleteEvent(event.id)}
-                                className="flex items-center gap-1 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-all hover:-translate-y-1"
+                                disabled={deletingEventId === event.id}
+                                className={`flex items-center gap-1 px-3 py-2 text-white rounded-lg text-sm font-medium transition-all hover:-translate-y-1 hover:shadow-lg ${
+                                  deletingEventId === event.id
+                                    ? "bg-red-400 cursor-not-allowed"
+                                    : "bg-red-500 hover:bg-red-600"
+                                }`}
+                                title="Delete this event"
                               >
-                                <Trash2 className="w-4 h-4" />
-                                Delete
+                                {deletingEventId === event.id ? (
+                                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-4 h-4" />
+                                )}
+                                {deletingEventId === event.id
+                                  ? "Deleting..."
+                                  : "Delete"}
                               </button>
                             </div>
                           </div>
@@ -709,7 +801,7 @@ export default function AdminDashboard() {
                     )}
                   </div>
                 </section>
-              ) : (
+              ) : activeTab === "calendar" ? (
                 <section className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl">
                   {/* Admin Panel */}
                   <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-xl p-4 mb-6 backdrop-blur-sm">
@@ -811,7 +903,195 @@ export default function AdminDashboard() {
                     })}
                   </div>
                 </section>
-              )}
+              ) : activeTab === "analytics" ? (
+                <section className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl">
+                  {/* Analytics Header */}
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-semibold text-white mb-2 flex items-center gap-3">
+                      <Users className="w-6 h-6" />
+                      User Analytics
+                    </h2>
+                    <p className="text-slate-400">
+                      Overview of all users and their statistics
+                    </p>
+                  </div>
+
+                  {/* Analytics Content */}
+                  {analyticsLoading ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+                      <p className="mt-4 text-slate-400">
+                        Loading analytics...
+                      </p>
+                    </div>
+                  ) : analyticsData ? (
+                    <div className="space-y-6">
+                      {/* Statistics Cards */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-xl p-6">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-sm font-medium text-blue-400">
+                              Total Users
+                            </h3>
+                            <Users className="w-5 h-5 text-blue-400" />
+                          </div>
+                          <p className="text-3xl font-bold text-white">
+                            {analyticsData.statistics.totalUsers}
+                          </p>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 border border-green-500/20 rounded-xl p-6">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-sm font-medium text-green-400">
+                              Students
+                            </h3>
+                            <GraduationCap className="w-5 h-5 text-green-400" />
+                          </div>
+                          <p className="text-3xl font-bold text-white">
+                            {analyticsData.statistics.totalStudents}
+                          </p>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/20 rounded-xl p-6">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-sm font-medium text-purple-400">
+                              Admins
+                            </h3>
+                            <User className="w-5 h-5 text-purple-400" />
+                          </div>
+                          <p className="text-3xl font-bold text-white">
+                            {analyticsData.statistics.totalAdmins}
+                          </p>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-orange-500/10 to-orange-600/10 border border-orange-500/20 rounded-xl p-6">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-sm font-medium text-orange-400">
+                              Recent Users (30 days)
+                            </h3>
+                            <Users className="w-5 h-5 text-orange-400" />
+                          </div>
+                          <p className="text-3xl font-bold text-white">
+                            {analyticsData.statistics.recentUsers}
+                          </p>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-pink-500/10 to-pink-600/10 border border-pink-500/20 rounded-xl p-6">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-sm font-medium text-pink-400">
+                              With Student ID
+                            </h3>
+                            <GraduationCap className="w-5 h-5 text-pink-400" />
+                          </div>
+                          <p className="text-3xl font-bold text-white">
+                            {analyticsData.statistics.usersWithStudentId}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Users by Department */}
+                      <div className="bg-slate-700/50 border border-slate-600/50 rounded-xl p-6">
+                        <h3 className="text-lg font-semibold text-white mb-4">
+                          Users by Department
+                        </h3>
+                        <div className="space-y-3">
+                          {analyticsData.statistics.usersByDepartment.map(
+                            (dept: any) => (
+                              <div
+                                key={dept.department}
+                                className="flex items-center justify-between p-3 bg-slate-600/30 rounded-lg"
+                              >
+                                <span className="text-slate-300">
+                                  {dept.department}
+                                </span>
+                                <span className="text-white font-semibold">
+                                  {dept.count} users
+                                </span>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+
+                      {/* All Users Table */}
+                      <div className="bg-slate-700/50 border border-slate-600/50 rounded-xl p-6">
+                        <h3 className="text-lg font-semibold text-white mb-4">
+                          All Users
+                        </h3>
+                        <div className="overflow-x-auto">
+                          <table className="w-full">
+                            <thead>
+                              <tr className="border-b border-slate-600">
+                                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">
+                                  Name
+                                </th>
+                                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">
+                                  Email
+                                </th>
+                                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">
+                                  Role
+                                </th>
+                                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">
+                                  Department
+                                </th>
+                                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">
+                                  Student ID
+                                </th>
+                                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">
+                                  Joined
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {analyticsData.users.map((user: any) => (
+                                <tr
+                                  key={user.id}
+                                  className="border-b border-slate-600/50 hover:bg-slate-600/20"
+                                >
+                                  <td className="py-3 px-4 text-sm text-white">
+                                    {user.name}
+                                  </td>
+                                  <td className="py-3 px-4 text-sm text-slate-300">
+                                    {user.email}
+                                  </td>
+                                  <td className="py-3 px-4">
+                                    <span
+                                      className={`text-xs font-medium px-2 py-1 rounded-full ${
+                                        user.role === "ADMIN"
+                                          ? "bg-purple-500/20 text-purple-400"
+                                          : "bg-blue-500/20 text-blue-400"
+                                      }`}
+                                    >
+                                      {user.role}
+                                    </span>
+                                  </td>
+                                  <td className="py-3 px-4 text-sm text-slate-300">
+                                    {user.department || "-"}
+                                  </td>
+                                  <td className="py-3 px-4 text-sm text-slate-300">
+                                    {user.student_id || "-"}
+                                  </td>
+                                  <td className="py-3 px-4 text-sm text-slate-400">
+                                    {new Date(
+                                      user.created_at
+                                    ).toLocaleDateString()}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-slate-400">
+                        Failed to load analytics data.
+                      </p>
+                    </div>
+                  )}
+                </section>
+              ) : null}
             </div>
 
             {/* Sidebar */}
@@ -844,7 +1124,7 @@ export default function AdminDashboard() {
                       </span>
                     </div>
                     <span className="text-xs text-slate-400 bg-slate-700/30 px-2 py-1 rounded-full">
-                      {departmentCounts["CS"] || 0} events
+                      {departmentCounts["Computer Science"] || 0} events
                     </span>
                   </div>
                   <div className="flex items-center justify-between py-3 border-b border-slate-100">
@@ -855,7 +1135,7 @@ export default function AdminDashboard() {
                       </span>
                     </div>
                     <span className="text-xs text-slate-400 bg-slate-700/30 px-2 py-1 rounded-full">
-                      {departmentCounts["SE"] || 0} events
+                      {departmentCounts["Software Engineering"] || 0} events
                     </span>
                   </div>
                   <div className="flex items-center justify-between py-3">
@@ -866,7 +1146,7 @@ export default function AdminDashboard() {
                       </span>
                     </div>
                     <span className="text-xs text-slate-400 bg-slate-700/30 px-2 py-1 rounded-full">
-                      {departmentCounts["IS"] || 0} events
+                      {departmentCounts["Information Systems"] || 0} events
                     </span>
                   </div>
                 </div>
@@ -914,7 +1194,11 @@ export default function AdminDashboard() {
                       Departments *
                     </label>
                     <div className="space-y-2">
-                      {["CS", "SE", "IS"].map((dept) => (
+                      {[
+                        "Computer Science",
+                        "Software Engineering",
+                        "Information Systems",
+                      ].map((dept) => (
                         <label key={dept} className="flex items-center">
                           <input
                             type="checkbox"

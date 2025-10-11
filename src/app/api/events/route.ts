@@ -34,13 +34,7 @@ export async function GET(req: NextRequest) {
       description: event.description,
       date: event.event_date?.toISOString().split("T")[0] || "",
       time: event.event_time
-        ? new Date(
-            `2000-01-01T${event.event_time.toISOString().split("T")[1]}`
-          ).toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: true,
-          })
+        ? event.event_time.toISOString().split("T")[1].substring(0, 5)
         : "",
       location: event.location,
       departments: event.departments,
@@ -125,10 +119,31 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Format event for frontend
+    const formattedEvent = {
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      date: event.event_date?.toISOString().split("T")[0] || "",
+      time: event.event_time
+        ? event.event_time.toISOString().split("T")[1].substring(0, 5)
+        : "",
+      location: event.location,
+      departments: event.departments,
+      registration_needed: event.registration_needed,
+      registration_link: event.registration_link,
+      cover_image: event.cover_image,
+      cover_color: event.cover_color,
+      created_by: event.created_by,
+      creator: event.creator,
+      created_at: event.created_at,
+      updated_at: event.updated_at,
+    };
+
     return NextResponse.json(
       {
         message: "Event created successfully",
-        event,
+        event: formattedEvent,
       },
       { status: 201 }
     );
@@ -137,4 +152,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
-
