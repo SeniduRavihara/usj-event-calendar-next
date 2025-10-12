@@ -256,7 +256,9 @@ export default function AdminDashboard() {
       closeModal();
     } catch (err) {
       console.error("Error saving event:", err);
-      showNotification(`Failed to save event: ${err.message}`, "error");
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown error occurred";
+      showNotification(`Failed to save event: ${errorMessage}`, "error");
     } finally {
       setIsLoading(false);
     }
@@ -292,7 +294,9 @@ export default function AdminDashboard() {
         console.log("Event deleted successfully from state");
       } catch (err) {
         console.error("Error deleting event:", err);
-        showNotification(`Failed to delete event: ${err.message}`, "error");
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error occurred";
+        showNotification(`Failed to delete event: ${errorMessage}`, "error");
       } finally {
         setDeletingEventId(null);
       }
