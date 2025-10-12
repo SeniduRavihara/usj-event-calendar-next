@@ -67,6 +67,11 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [calendarView, setCalendarView] = useState<"month" | "week" | "day">(
+    "month"
+  );
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
@@ -113,6 +118,15 @@ export default function AdminDashboard() {
     };
 
     fetchEvents();
+  }, []);
+
+  // Update current time every minute for live time indicator
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
   }, []);
 
   // Fetch analytics data
@@ -405,21 +419,73 @@ export default function AdminDashboard() {
   };
 
   const getEventsForDate = (date: Date) => {
-    const dateString = date.toISOString().split("T")[0];
+    // Create date strings in local timezone to avoid UTC conversion issues
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const dateString = `${year}-${month}-${day}`;
+
     return events.filter((event) => {
       if (!event.date) return false;
-      const eventDate = new Date(event.date).toISOString().split("T")[0];
-      return eventDate === dateString;
+      // Compare with the event date directly (already in YYYY-MM-DD format from API)
+      return event.date === dateString;
     });
   };
 
-  const navigateMonth = (direction: "prev" | "next") => {
+  // Get events for a specific week
+  const getEventsForWeek = (startDate: Date) => {
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6);
+
+    return events.filter((event) => {
+      if (!event.date) return false;
+      // Parse event date in local timezone
+      const eventDate = new Date(event.date + "T00:00:00");
+      return eventDate >= startDate && eventDate <= endDate;
+    });
+  };
+
+  // Get week days for week view
+  const getWeekDays = (startDate: Date) => {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startDate);
+      day.setDate(startDate.getDate() + i);
+      days.push(day);
+    }
+    return days;
+  };
+
+  // Get start of week (Sunday)
+  const getStartOfWeek = (date: Date) => {
+    const startOfWeek = new Date(date);
+    const day = startOfWeek.getDay();
+    startOfWeek.setDate(startOfWeek.getDate() - day);
+    startOfWeek.setHours(0, 0, 0, 0);
+    return startOfWeek;
+  };
+
+  const navigateDate = (direction: "prev" | "next") => {
     setCurrentDate((prev) => {
       const newDate = new Date(prev);
-      if (direction === "prev") {
-        newDate.setMonth(newDate.getMonth() - 1);
-      } else {
-        newDate.setMonth(newDate.getMonth() + 1);
+      if (calendarView === "month") {
+        if (direction === "prev") {
+          newDate.setMonth(newDate.getMonth() - 1);
+        } else {
+          newDate.setMonth(newDate.getMonth() + 1);
+        }
+      } else if (calendarView === "week") {
+        if (direction === "prev") {
+          newDate.setDate(newDate.getDate() - 7);
+        } else {
+          newDate.setDate(newDate.getDate() + 7);
+        }
+      } else if (calendarView === "day") {
+        if (direction === "prev") {
+          newDate.setDate(newDate.getDate() - 1);
+        } else {
+          newDate.setDate(newDate.getDate() + 1);
+        }
       }
       return newDate;
     });
@@ -819,93 +885,401 @@ export default function AdminDashboard() {
                     </p>
                   </div>
 
-                  {/* Calendar Header */}
+                  {/* Calendar Header with View Toggle */}
                   <div className="flex items-center justify-between mb-6">
-                    <button
-                      onClick={() => navigateMonth("prev")}
-                      className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 hover:text-white transition-colors"
-                    >
-                      ←
-                    </button>
-                    <h2 className="text-xl font-semibold text-white">
-                      {currentDate.toLocaleDateString("en-US", {
-                        month: "long",
-                        year: "numeric",
-                      })}
+                    <h2 className="text-2xl font-semibold text-white">
+                      {calendarView === "month"
+                        ? currentDate.toLocaleDateString("en-US", {
+                            month: "long",
+                            year: "numeric",
+                          })
+                        : calendarView === "week"
+                        ? `Week of ${getStartOfWeek(
+                            currentDate
+                          ).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          })}`
+                        : currentDate.toLocaleDateString("en-US", {
+                            weekday: "long",
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
                     </h2>
-                    <button
-                      onClick={() => navigateMonth("next")}
-                      className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 hover:text-white transition-colors"
-                    >
-                      →
-                    </button>
+                    <div className="flex items-center gap-4">
+                      {/* View Toggle Buttons */}
+                      <div className="flex bg-slate-700/50 rounded-xl p-1">
+                        <button
+                          onClick={() => setCalendarView("month")}
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                            calendarView === "month"
+                              ? "bg-purple-500 text-white"
+                              : "text-slate-400 hover:text-white"
+                          }`}
+                        >
+                          Month
+                        </button>
+                        <button
+                          onClick={() => setCalendarView("week")}
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                            calendarView === "week"
+                              ? "bg-purple-500 text-white"
+                              : "text-slate-400 hover:text-white"
+                          }`}
+                        >
+                          Week
+                        </button>
+                        <button
+                          onClick={() => setCalendarView("day")}
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                            calendarView === "day"
+                              ? "bg-purple-500 text-white"
+                              : "text-slate-400 hover:text-white"
+                          }`}
+                        >
+                          Day
+                        </button>
+                      </div>
+
+                      {/* Navigation Buttons */}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => navigateDate("prev")}
+                          className="p-3 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white hover:bg-slate-700/70 hover:border-purple-500/50 transition-all"
+                        >
+                          ←
+                        </button>
+                        <button
+                          onClick={() => setCurrentDate(new Date())}
+                          className="px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white hover:bg-slate-700/70 hover:border-purple-500/50 transition-all text-sm font-medium"
+                        >
+                          Today
+                        </button>
+                        <button
+                          onClick={() => navigateDate("next")}
+                          className="p-3 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white hover:bg-slate-700/70 hover:border-purple-500/50 transition-all"
+                        >
+                          →
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Calendar Grid */}
-                  <div className="grid grid-cols-7 gap-1 bg-slate-700/30 rounded-xl p-2">
-                    {/* Day headers */}
-                    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
-                      (day) => (
-                        <div
-                          key={day}
-                          className="p-2 text-center text-sm font-medium text-slate-400"
-                        >
-                          {day}
-                        </div>
-                      )
-                    )}
-
-                    {/* Calendar days */}
-                    {getDaysInMonth(currentDate).map((day, index) => {
-                      if (!day) {
-                        return <div key={index} className="p-2"></div>;
-                      }
-
-                      const dayEvents = getEventsForDate(day);
-                      const isToday =
-                        day.toDateString() === new Date().toDateString();
-                      const isCurrentMonth =
-                        day.getMonth() === currentDate.getMonth();
-
-                      return (
-                        <div
-                          key={index}
-                          className={`p-2 min-h-[100px] border border-slate-600/30 rounded-lg ${
-                            isToday
-                              ? "bg-purple-500/20 border-purple-500/50"
-                              : ""
-                          } ${!isCurrentMonth ? "opacity-50" : ""}`}
-                        >
+                  {/* Calendar Content - Conditional Rendering */}
+                  {calendarView === "month" ? (
+                    <div className="grid grid-cols-7 gap-1 bg-slate-700/30 rounded-xl p-2">
+                      {/* Day headers */}
+                      {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                        (day) => (
                           <div
-                            className={`text-sm font-medium mb-1 ${
-                              isToday ? "text-purple-400" : "text-slate-300"
-                            }`}
+                            key={day}
+                            className="p-2 text-center text-sm font-medium text-slate-400"
                           >
-                            {day.getDate()}
+                            {day}
                           </div>
-                          <div className="space-y-1">
-                            {dayEvents.slice(0, 2).map((event, eventIndex) => (
+                        )
+                      )}
+
+                      {/* Calendar days */}
+                      {getDaysInMonth(currentDate).map((day, index) => {
+                        if (!day) {
+                          return <div key={index} className="p-2"></div>;
+                        }
+
+                        const dayEvents = getEventsForDate(day);
+                        const isToday =
+                          day.toDateString() === new Date().toDateString();
+                        const isCurrentMonth =
+                          day.getMonth() === currentDate.getMonth();
+
+                        return (
+                          <div
+                            key={index}
+                            className={`p-2 min-h-[120px] border border-slate-600/30 rounded-lg ${
+                              isToday
+                                ? "bg-purple-500/20 border-purple-500/50"
+                                : ""
+                            } ${!isCurrentMonth ? "opacity-50" : ""}`}
+                          >
+                            <div
+                              className={`text-sm font-medium mb-1 ${
+                                isToday ? "text-purple-400" : "text-slate-300"
+                              }`}
+                            >
+                              {day.getDate()}
+                            </div>
+                            <div className="space-y-1">
+                              {dayEvents
+                                .slice(0, 3)
+                                .map((event, eventIndex) => (
+                                  <div
+                                    key={eventIndex}
+                                    className="text-xs p-1 rounded bg-blue-500/80 text-white truncate cursor-pointer hover:bg-blue-500 transition-colors"
+                                    title={event.title}
+                                    onClick={() => openEditModal(event)}
+                                  >
+                                    {event.title.length > 12
+                                      ? event.title.substring(0, 12) + "..."
+                                      : event.title}
+                                  </div>
+                                ))}
+                              {dayEvents.length > 3 && (
+                                <div
+                                  className="text-xs text-slate-400 text-center cursor-pointer hover:bg-slate-600/60 rounded p-1"
+                                  onClick={() => {
+                                    setSelectedDate(day);
+                                    setCalendarView("day");
+                                  }}
+                                >
+                                  +{dayEvents.length - 3} more
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : calendarView === "week" ? (
+                    <div className="grid grid-cols-7 gap-1 bg-slate-700/30 rounded-xl p-2">
+                      {/* Day headers */}
+                      {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                        (day) => (
+                          <div
+                            key={day}
+                            className="p-2 text-center text-sm font-medium text-slate-400"
+                          >
+                            {day}
+                          </div>
+                        )
+                      )}
+                      {getWeekDays(getStartOfWeek(currentDate)).map(
+                        (day, index) => {
+                          const dayEvents = getEventsForDate(day);
+                          const isToday =
+                            day.toDateString() === new Date().toDateString();
+
+                          return (
+                            <div
+                              key={day.toISOString()}
+                              className={`p-3 min-h-[200px] border border-slate-600/30 rounded-lg ${
+                                isToday
+                                  ? "bg-purple-500/20 border-purple-500/50"
+                                  : ""
+                              }`}
+                            >
                               <div
-                                key={eventIndex}
-                                className="text-xs p-1 rounded bg-blue-500/80 text-white truncate cursor-pointer hover:bg-blue-500 transition-colors"
-                                title={event.title}
-                                onClick={() => openEditModal(event)}
+                                className={`text-sm font-medium mb-3 ${
+                                  isToday ? "text-purple-400" : "text-slate-300"
+                                }`}
                               >
-                                {event.title.length > 12
-                                  ? event.title.substring(0, 12) + "..."
-                                  : event.title}
+                                {day.getDate()}
                               </div>
-                            ))}
-                            {dayEvents.length > 2 && (
-                              <div className="text-xs text-slate-400 text-center">
-                                +{dayEvents.length - 2} more
+                              <div className="space-y-2">
+                                {dayEvents.map((event) => (
+                                  <div
+                                    key={event.id}
+                                    className="text-xs p-2 rounded bg-blue-500/80 text-white cursor-pointer hover:bg-blue-500 transition-colors"
+                                    title={`${event.title} - ${event.time}`}
+                                    onClick={() => openEditModal(event)}
+                                  >
+                                    <div className="font-medium truncate">
+                                      {event.title}
+                                    </div>
+                                    <div className="text-xs opacity-75">
+                                      {event.time}
+                                    </div>
+                                  </div>
+                                ))}
                               </div>
-                            )}
-                          </div>
+                            </div>
+                          );
+                        }
+                      )}
+                    </div>
+                  ) : (
+                    <div className="bg-slate-700/30 rounded-xl p-6">
+                      <div className="text-center mb-6">
+                        <h3 className="text-xl font-semibold text-white mb-2">
+                          {currentDate.toLocaleDateString("en-US", {
+                            weekday: "long",
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </h3>
+                        <p className="text-slate-400">
+                          {getEventsForDate(currentDate).length} events
+                          scheduled
+                        </p>
+                      </div>
+
+                      {/* Timeline View */}
+                      <div className="relative">
+                        {/* Timeline Line */}
+                        <div className="absolute left-20 top-0 bottom-0 w-0.5 bg-slate-600/50"></div>
+
+                        {/* Current Time Indicator */}
+                        {(() => {
+                          const isToday =
+                            currentTime.toDateString() ===
+                            currentDate.toDateString();
+                          if (!isToday) return null;
+
+                          const currentHour = currentTime.getHours();
+                          const currentMinute = currentTime.getMinutes();
+                          const currentTimePosition =
+                            (currentHour + currentMinute / 60) * 60; // 60px per hour
+
+                          return (
+                            <div
+                              className="absolute left-20 top-0 w-full z-10"
+                              style={{
+                                transform: `translateY(${currentTimePosition}px)`,
+                              }}
+                            >
+                              <div className="flex items-center">
+                                <div className="w-3 h-3 bg-red-500 rounded-full border-2 border-white shadow-lg -translate-x-1.5"></div>
+                                <div className="h-0.5 bg-red-500 flex-1"></div>
+                                <div className="ml-2 text-xs text-red-400 font-medium bg-slate-800/90 px-2 py-1 rounded">
+                                  {currentTime.toLocaleTimeString("en-US", {
+                                    hour: "numeric",
+                                    minute: "2-digit",
+                                    hour12: true,
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+
+                        {/* Hour Labels and Events */}
+                        <div className="space-y-0">
+                          {Array.from({ length: 24 }, (_, hour) => {
+                            const hourEvents = getEventsForDate(
+                              currentDate
+                            ).filter((event) => {
+                              if (!event.time) return false;
+                              const eventHour = parseInt(
+                                event.time.split(":")[0]
+                              );
+                              return eventHour === hour;
+                            });
+
+                            return (
+                              <div
+                                key={hour}
+                                className="relative flex items-start min-h-[60px]"
+                              >
+                                {/* Hour Label */}
+                                <div className="w-20 text-right pr-4 pt-2 flex-shrink-0">
+                                  <span className="text-sm text-slate-400 font-medium">
+                                    {hour === 0
+                                      ? "12 AM"
+                                      : hour < 12
+                                      ? `${hour} AM`
+                                      : hour === 12
+                                      ? "12 PM"
+                                      : `${hour - 12} PM`}
+                                  </span>
+                                </div>
+
+                                {/* Timeline Dot */}
+                                <div className="absolute left-18 w-3 h-3 bg-slate-600 rounded-full border-2 border-slate-700 -translate-x-1/2 top-2"></div>
+
+                                {/* Hour Grid Line */}
+                                <div className="absolute left-20 right-0 h-px bg-slate-700/30 top-7"></div>
+
+                                {/* Events for this hour */}
+                                <div className="ml-8 flex-1 min-h-[60px] relative">
+                                  {hourEvents.length === 0 ? (
+                                    <div className="h-12"></div>
+                                  ) : (
+                                    <div className="space-y-2">
+                                      {hourEvents.map((event) => (
+                                        <div
+                                          key={event.id}
+                                          className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-lg p-3 hover:from-orange-500/30 hover:to-red-500/30 transition-all cursor-pointer group"
+                                          onClick={() => openEditModal(event)}
+                                        >
+                                          <div className="flex items-start gap-3">
+                                            <div className="w-8 h-8 bg-orange-500/20 border border-orange-500/30 rounded-lg flex items-center justify-center text-orange-300 group-hover:bg-orange-500/30 transition-colors">
+                                              <Calendar className="w-4 h-4" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                              <div className="flex items-center gap-2 mb-1">
+                                                <h4 className="font-semibold text-white truncate">
+                                                  {event.title}
+                                                </h4>
+                                                {event.departments &&
+                                                  Array.isArray(
+                                                    event.departments
+                                                  ) && (
+                                                    <span className="px-2 py-1 rounded-full text-xs font-medium text-white bg-blue-500">
+                                                      {event.departments[0]}
+                                                    </span>
+                                                  )}
+                                              </div>
+                                              <p className="text-slate-300 text-sm mb-2 line-clamp-2">
+                                                {event.description}
+                                              </p>
+                                              <div className="flex items-center gap-4 text-xs text-slate-400">
+                                                <span className="flex items-center gap-1">
+                                                  <Calendar className="w-3 h-3" />
+                                                  {event.time}
+                                                </span>
+                                                <span className="flex items-center gap-1">
+                                                  <MapPin className="w-3 h-3" />
+                                                  {event.location}
+                                                </span>
+                                              </div>
+                                            </div>
+                                            <div className="flex gap-1">
+                                              <button
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  openEditModal(event);
+                                                }}
+                                                className="p-1.5 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 transition-colors"
+                                              >
+                                                <Edit className="w-3 h-3" />
+                                              </button>
+                                              <button
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  deleteEvent(event.id);
+                                                }}
+                                                className="p-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition-colors"
+                                              >
+                                                <Trash2 className="w-3 h-3" />
+                                              </button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
-                      );
-                    })}
-                  </div>
+
+                        {/* No events message */}
+                        {getEventsForDate(currentDate).length === 0 && (
+                          <div className="text-center py-12">
+                            <Calendar className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+                            <p className="text-slate-400 text-lg">
+                              No events scheduled for this day
+                            </p>
+                            <p className="text-slate-500 text-sm mt-2">
+                              Events will appear on the timeline when scheduled
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </section>
               ) : activeTab === "analytics" ? (
                 <section className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl">

@@ -92,11 +92,23 @@ export default function CalendarPage() {
 
   // Get events for a specific date
   const getEventsForDate = (date: Date) => {
-    const dateStr = date.toISOString().split("T")[0];
+    // Create date string in local timezone to avoid UTC conversion issues
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const dateStr = `${year}-${month}-${day}`;
+
     return events.filter((event) => {
-      const eventStart = new Date(event.start_date).toISOString().split("T")[0];
-      const eventEnd = new Date(event.end_date).toISOString().split("T")[0];
-      return dateStr >= eventStart && dateStr <= eventEnd;
+      // Parse event dates in local timezone
+      const eventStart = new Date(event.start_date + "T00:00:00");
+      const eventEnd = new Date(event.end_date + "T00:00:00");
+      const eventStartStr = `${eventStart.getFullYear()}-${String(
+        eventStart.getMonth() + 1
+      ).padStart(2, "0")}-${String(eventStart.getDate()).padStart(2, "0")}`;
+      const eventEndStr = `${eventEnd.getFullYear()}-${String(
+        eventEnd.getMonth() + 1
+      ).padStart(2, "0")}-${String(eventEnd.getDate()).padStart(2, "0")}`;
+      return dateStr >= eventStartStr && dateStr <= eventEndStr;
     });
   };
 
