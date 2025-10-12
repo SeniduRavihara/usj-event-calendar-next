@@ -52,7 +52,6 @@ export default function Dashboard() {
   const [calendarView, setCalendarView] = useState<"month" | "week" | "day">(
     "month"
   );
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   // Fetch events from API
@@ -139,19 +138,6 @@ export default function Dashboard() {
       if (!event.date) return false;
       // Compare with the event date directly (already in YYYY-MM-DD format from API)
       return event.date === dateString;
-    });
-  };
-
-  // Get events for a specific week
-  const getEventsForWeek = (startDate: Date) => {
-    const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 6);
-
-    return events.filter((event) => {
-      if (!event.date) return false;
-      // Parse event date in local timezone
-      const eventDate = new Date(event.date + "T00:00:00");
-      return eventDate >= startDate && eventDate <= endDate;
     });
   };
 
@@ -638,7 +624,7 @@ export default function Dashboard() {
                             <div
                               className="text-xs text-slate-400 text-center cursor-pointer hover:bg-slate-600/60 rounded p-1"
                               onClick={() => {
-                                setSelectedDate(day);
+                                setCurrentDate(day);
                                 setCalendarView("day");
                               }}
                             >
@@ -662,55 +648,51 @@ export default function Dashboard() {
                       </div>
                     )
                   )}
-                  {getWeekDays(getStartOfWeek(currentDate)).map(
-                    (day, index) => {
-                      const dayEvents = getEventsForDate(day);
-                      const isToday =
-                        day.toDateString() === new Date().toDateString();
+                  {getWeekDays(getStartOfWeek(currentDate)).map((day) => {
+                    const dayEvents = getEventsForDate(day);
+                    const isToday =
+                      day.toDateString() === new Date().toDateString();
 
-                      return (
+                    return (
+                      <div
+                        key={day.toISOString()}
+                        className={`min-h-[200px] p-3 border border-slate-600/20 transition-all hover:bg-slate-600/40 ${
+                          isToday
+                            ? "bg-purple-500/20 border-purple-500/50"
+                            : "bg-slate-600/20"
+                        }`}
+                      >
                         <div
-                          key={day.toISOString()}
-                          className={`min-h-[200px] p-3 border border-slate-600/20 transition-all hover:bg-slate-600/40 ${
-                            isToday
-                              ? "bg-purple-500/20 border-purple-500/50"
-                              : "bg-slate-600/20"
+                          className={`font-semibold text-sm mb-3 ${
+                            isToday ? "text-purple-300" : "text-white"
                           }`}
                         >
-                          <div
-                            className={`font-semibold text-sm mb-3 ${
-                              isToday ? "text-purple-300" : "text-white"
-                            }`}
-                          >
-                            {day.getDate()}
-                          </div>
-                          <div className="space-y-2">
-                            {dayEvents.map((event) => (
-                              <div
-                                key={event.id}
-                                className={`text-xs p-2 rounded cursor-pointer transition-all hover:scale-105 ${
-                                  event.departments &&
-                                  Array.isArray(event.departments)
-                                    ? getDepartmentTagClass(
-                                        event.departments[0]
-                                      )
-                                    : "bg-blue-500"
-                                } text-white`}
-                                title={`${event.title} - ${event.time}`}
-                              >
-                                <div className="font-medium truncate">
-                                  {event.title}
-                                </div>
-                                <div className="text-xs opacity-75">
-                                  {event.time}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
+                          {day.getDate()}
                         </div>
-                      );
-                    }
-                  )}
+                        <div className="space-y-2">
+                          {dayEvents.map((event) => (
+                            <div
+                              key={event.id}
+                              className={`text-xs p-2 rounded cursor-pointer transition-all hover:scale-105 ${
+                                event.departments &&
+                                Array.isArray(event.departments)
+                                  ? getDepartmentTagClass(event.departments[0])
+                                  : "bg-blue-500"
+                              } text-white`}
+                              title={`${event.title} - ${event.time}`}
+                            >
+                              <div className="font-medium truncate">
+                                {event.title}
+                              </div>
+                              <div className="text-xs opacity-75">
+                                {event.time}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="bg-slate-700/30 rounded-xl p-6">

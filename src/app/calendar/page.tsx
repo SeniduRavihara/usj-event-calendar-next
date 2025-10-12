@@ -43,19 +43,41 @@ export default function CalendarPage() {
         if (response.ok) {
           const data = await response.json();
           // Transform events to match calendar component interface
-          const transformedEvents = (data.events || []).map((event: any) => ({
-            id: event.id,
-            title: event.title,
-            description: event.description,
-            start_date:
-              event.date + (event.time ? `T${event.time}` : "T00:00:00"),
-            end_date:
-              event.date + (event.time ? `T${event.time}` : "T23:59:59"),
-            location: event.location || "",
-            department: event.departments?.[0] || "General",
-            created_at: event.created_at,
-            updated_at: event.updated_at,
-          }));
+          const transformedEvents = (data.events || []).map(
+            (event: {
+              id: number;
+              title: string;
+              description: string;
+              date: string;
+              time: string;
+              location: string;
+              departments: string[] | null;
+              registration_needed: boolean;
+              registration_link?: string;
+              cover_color?: string;
+              created_by: number;
+              creator: {
+                id: number;
+                name: string;
+                email: string;
+                department?: string;
+              };
+              created_at: string;
+              updated_at: string;
+            }) => ({
+              id: event.id,
+              title: event.title,
+              description: event.description,
+              start_date:
+                event.date + (event.time ? `T${event.time}` : "T00:00:00"),
+              end_date:
+                event.date + (event.time ? `T${event.time}` : "T23:59:59"),
+              location: event.location || "",
+              department: event.departments?.[0] || "General",
+              created_at: event.created_at,
+              updated_at: event.updated_at,
+            })
+          );
           console.log("Fetched events:", transformedEvents);
           setEvents(transformedEvents);
         }
@@ -109,18 +131,6 @@ export default function CalendarPage() {
         eventEnd.getMonth() + 1
       ).padStart(2, "0")}-${String(eventEnd.getDate()).padStart(2, "0")}`;
       return dateStr >= eventStartStr && dateStr <= eventEndStr;
-    });
-  };
-
-  // Get events for a specific week
-  const getEventsForWeek = (startDate: Date) => {
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 6);
-
-    return events.filter((event) => {
-      const eventStart = new Date(event.start_date);
-      const eventEnd = new Date(event.end_date);
-      return eventStart <= endDate && eventEnd >= startDate;
     });
   };
 
@@ -271,7 +281,6 @@ export default function CalendarPage() {
   // Render week view
   const renderWeekView = () => {
     const weekDays = getWeekDays(currentDate);
-    const weekEvents = getEventsForWeek(weekDays[0]);
 
     return (
       <div className="grid grid-cols-7 gap-1">

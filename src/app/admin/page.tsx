@@ -70,7 +70,6 @@ export default function AdminDashboard() {
   const [calendarView, setCalendarView] = useState<"month" | "week" | "day">(
     "month"
   );
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -81,7 +80,29 @@ export default function AdminDashboard() {
   const [deletingEventId, setDeletingEventId] = useState<number | null>(null);
 
   // Analytics state
-  const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [analyticsData, setAnalyticsData] = useState<{
+    statistics: {
+      totalUsers: number;
+      totalStudents: number;
+      totalAdmins: number;
+      recentUsers: number;
+      usersWithStudentId: number;
+      usersByDepartment: Array<{
+        department: string;
+        count: number;
+      }>;
+    };
+    users: Array<{
+      id: number;
+      name: string;
+      email: string;
+      role: string;
+      department: string | null;
+      student_id: string | null;
+      created_at: string;
+      updated_at: string;
+    }>;
+  } | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   const [formData, setFormData] = useState<EventFormData>({
@@ -429,19 +450,6 @@ export default function AdminDashboard() {
       if (!event.date) return false;
       // Compare with the event date directly (already in YYYY-MM-DD format from API)
       return event.date === dateString;
-    });
-  };
-
-  // Get events for a specific week
-  const getEventsForWeek = (startDate: Date) => {
-    const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 6);
-
-    return events.filter((event) => {
-      if (!event.date) return false;
-      // Parse event date in local timezone
-      const eventDate = new Date(event.date + "T00:00:00");
-      return eventDate >= startDate && eventDate <= endDate;
     });
   };
 
@@ -1028,7 +1036,7 @@ export default function AdminDashboard() {
                                 <div
                                   className="text-xs text-slate-400 text-center cursor-pointer hover:bg-slate-600/60 rounded p-1"
                                   onClick={() => {
-                                    setSelectedDate(day);
+                                    setCurrentDate(day);
                                     setCalendarView("day");
                                   }}
                                 >
@@ -1053,49 +1061,47 @@ export default function AdminDashboard() {
                           </div>
                         )
                       )}
-                      {getWeekDays(getStartOfWeek(currentDate)).map(
-                        (day, index) => {
-                          const dayEvents = getEventsForDate(day);
-                          const isToday =
-                            day.toDateString() === new Date().toDateString();
+                      {getWeekDays(getStartOfWeek(currentDate)).map((day) => {
+                        const dayEvents = getEventsForDate(day);
+                        const isToday =
+                          day.toDateString() === new Date().toDateString();
 
-                          return (
+                        return (
+                          <div
+                            key={day.toISOString()}
+                            className={`p-3 min-h-[200px] border border-slate-600/30 rounded-lg ${
+                              isToday
+                                ? "bg-purple-500/20 border-purple-500/50"
+                                : ""
+                            }`}
+                          >
                             <div
-                              key={day.toISOString()}
-                              className={`p-3 min-h-[200px] border border-slate-600/30 rounded-lg ${
-                                isToday
-                                  ? "bg-purple-500/20 border-purple-500/50"
-                                  : ""
+                              className={`text-sm font-medium mb-3 ${
+                                isToday ? "text-purple-400" : "text-slate-300"
                               }`}
                             >
-                              <div
-                                className={`text-sm font-medium mb-3 ${
-                                  isToday ? "text-purple-400" : "text-slate-300"
-                                }`}
-                              >
-                                {day.getDate()}
-                              </div>
-                              <div className="space-y-2">
-                                {dayEvents.map((event) => (
-                                  <div
-                                    key={event.id}
-                                    className="text-xs p-2 rounded bg-blue-500/80 text-white cursor-pointer hover:bg-blue-500 transition-colors"
-                                    title={`${event.title} - ${event.time}`}
-                                    onClick={() => openEditModal(event)}
-                                  >
-                                    <div className="font-medium truncate">
-                                      {event.title}
-                                    </div>
-                                    <div className="text-xs opacity-75">
-                                      {event.time}
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
+                              {day.getDate()}
                             </div>
-                          );
-                        }
-                      )}
+                            <div className="space-y-2">
+                              {dayEvents.map((event) => (
+                                <div
+                                  key={event.id}
+                                  className="text-xs p-2 rounded bg-blue-500/80 text-white cursor-pointer hover:bg-blue-500 transition-colors"
+                                  title={`${event.title} - ${event.time}`}
+                                  onClick={() => openEditModal(event)}
+                                >
+                                  <div className="font-medium truncate">
+                                    {event.title}
+                                  </div>
+                                  <div className="text-xs opacity-75">
+                                    {event.time}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="bg-slate-700/30 rounded-xl p-6">
@@ -1374,7 +1380,7 @@ export default function AdminDashboard() {
                         </h3>
                         <div className="space-y-3">
                           {analyticsData.statistics.usersByDepartment.map(
-                            (dept: any) => (
+                            (dept: { department: string; count: number }) => (
                               <div
                                 key={dept.department}
                                 className="flex items-center justify-between p-3 bg-slate-600/30 rounded-lg"
@@ -1421,41 +1427,51 @@ export default function AdminDashboard() {
                               </tr>
                             </thead>
                             <tbody>
-                              {analyticsData.users.map((user: any) => (
-                                <tr
-                                  key={user.id}
-                                  className="border-b border-slate-600/50 hover:bg-slate-600/20"
-                                >
-                                  <td className="py-3 px-4 text-sm text-white">
-                                    {user.name}
-                                  </td>
-                                  <td className="py-3 px-4 text-sm text-slate-300">
-                                    {user.email}
-                                  </td>
-                                  <td className="py-3 px-4">
-                                    <span
-                                      className={`text-xs font-medium px-2 py-1 rounded-full ${
-                                        user.role === "ADMIN"
-                                          ? "bg-purple-500/20 text-purple-400"
-                                          : "bg-blue-500/20 text-blue-400"
-                                      }`}
-                                    >
-                                      {user.role}
-                                    </span>
-                                  </td>
-                                  <td className="py-3 px-4 text-sm text-slate-300">
-                                    {user.department || "-"}
-                                  </td>
-                                  <td className="py-3 px-4 text-sm text-slate-300">
-                                    {user.student_id || "-"}
-                                  </td>
-                                  <td className="py-3 px-4 text-sm text-slate-400">
-                                    {new Date(
-                                      user.created_at
-                                    ).toLocaleDateString()}
-                                  </td>
-                                </tr>
-                              ))}
+                              {analyticsData.users.map(
+                                (user: {
+                                  id: number;
+                                  name: string;
+                                  email: string;
+                                  role: string;
+                                  department: string | null;
+                                  student_id: string | null;
+                                  created_at: string;
+                                }) => (
+                                  <tr
+                                    key={user.id}
+                                    className="border-b border-slate-600/50 hover:bg-slate-600/20"
+                                  >
+                                    <td className="py-3 px-4 text-sm text-white">
+                                      {user.name}
+                                    </td>
+                                    <td className="py-3 px-4 text-sm text-slate-300">
+                                      {user.email}
+                                    </td>
+                                    <td className="py-3 px-4">
+                                      <span
+                                        className={`text-xs font-medium px-2 py-1 rounded-full ${
+                                          user.role === "ADMIN"
+                                            ? "bg-purple-500/20 text-purple-400"
+                                            : "bg-blue-500/20 text-blue-400"
+                                        }`}
+                                      >
+                                        {user.role}
+                                      </span>
+                                    </td>
+                                    <td className="py-3 px-4 text-sm text-slate-300">
+                                      {user.department || "-"}
+                                    </td>
+                                    <td className="py-3 px-4 text-sm text-slate-300">
+                                      {user.student_id || "-"}
+                                    </td>
+                                    <td className="py-3 px-4 text-sm text-slate-400">
+                                      {new Date(
+                                        user.created_at
+                                      ).toLocaleDateString()}
+                                    </td>
+                                  </tr>
+                                )
+                              )}
                             </tbody>
                           </table>
                         </div>
