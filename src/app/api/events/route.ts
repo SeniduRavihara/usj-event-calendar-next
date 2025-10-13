@@ -94,6 +94,16 @@ export async function POST(req: NextRequest) {
     const eventDate = new Date(date);
     const eventTime = time ? new Date(`2000-01-01T${time}`) : null;
 
+    // Process departments for database storage
+    let departmentsForDB = null;
+    if (departments) {
+      if (typeof departments === "string") {
+        departmentsForDB = JSON.parse(departments);
+      } else if (Array.isArray(departments)) {
+        departmentsForDB = departments;
+      }
+    }
+
     const event = await prisma.event.create({
       data: {
         title,
@@ -101,7 +111,7 @@ export async function POST(req: NextRequest) {
         event_date: eventDate,
         event_time: eventTime,
         location,
-        departments: departments ? JSON.parse(departments) : null,
+        departments: departmentsForDB,
         registration_needed: registration_needed || false,
         registration_link,
         cover_color,

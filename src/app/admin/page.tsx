@@ -129,6 +129,19 @@ export default function AdminDashboard() {
           throw new Error("Failed to fetch events");
         }
         const data = await response.json();
+        console.log("=== ADMIN FRONTEND EVENTS FETCH ===");
+        console.log("Events received:", data.events);
+        if (data.events && data.events.length > 0) {
+          console.log("First event departments:", data.events[0].departments);
+          console.log(
+            "Type of first event departments:",
+            typeof data.events[0].departments
+          );
+          console.log(
+            "Is first event departments an array?",
+            Array.isArray(data.events[0].departments)
+          );
+        }
         setEvents(data.events || []);
       } catch (err) {
         console.error("Error fetching events:", err);
@@ -506,11 +519,24 @@ export default function AdminDashboard() {
       event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (event.location &&
         event.location.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    // Create department mapping for short codes
+    const departmentMap: Record<string, string[]> = {
+      "Computer Science": ["Computer Science", "CS"],
+      "Software Engineering": ["Software Engineering", "SE"],
+      "Information Systems": ["Information Systems", "IS"],
+    };
+
     const matchesDepartment =
       departmentFilter === "all" ||
       (event.departments &&
         Array.isArray(event.departments) &&
-        event.departments.includes(departmentFilter));
+        (event.departments.includes(departmentFilter) ||
+          (departmentMap[departmentFilter] &&
+            event.departments.some((dept) =>
+              departmentMap[departmentFilter].includes(dept)
+            ))));
+
     return matchesSearch && matchesDepartment;
   });
 
@@ -790,11 +816,30 @@ export default function AdminDashboard() {
                                   <h3 className="text-lg font-semibold text-white truncate">
                                     {event.title}
                                   </h3>
-                                  <span
-                                    className={`${departmentInfo.color} text-white text-xs font-medium px-2 py-1 rounded-full`}
-                                  >
-                                    {departmentInfo.name}
-                                  </span>
+                                  <div className="flex flex-wrap gap-1">
+                                    {event.departments &&
+                                    Array.isArray(event.departments) ? (
+                                      event.departments.map((dept, index) => {
+                                        const deptInfo = getDepartmentInfo([
+                                          dept,
+                                        ]);
+                                        return (
+                                          <span
+                                            key={index}
+                                            className={`${deptInfo.color} text-white text-xs font-medium px-2 py-1 rounded-full`}
+                                          >
+                                            {deptInfo.name}
+                                          </span>
+                                        );
+                                      })
+                                    ) : (
+                                      <span
+                                        className={`${departmentInfo.color} text-white text-xs font-medium px-2 py-1 rounded-full`}
+                                      >
+                                        {departmentInfo.name}
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                                 <p className="text-slate-300 text-sm mb-3">
                                   {event.description}
@@ -1221,9 +1266,18 @@ export default function AdminDashboard() {
                                                   Array.isArray(
                                                     event.departments
                                                   ) && (
-                                                    <span className="px-2 py-1 rounded-full text-xs font-medium text-white bg-blue-500">
-                                                      {event.departments[0]}
-                                                    </span>
+                                                    <div className="flex flex-wrap gap-1">
+                                                      {event.departments.map(
+                                                        (dept, index) => (
+                                                          <span
+                                                            key={index}
+                                                            className="px-2 py-1 rounded-full text-xs font-medium text-white bg-blue-500"
+                                                          >
+                                                            {dept}
+                                                          </span>
+                                                        )
+                                                      )}
+                                                    </div>
                                                   )}
                                               </div>
                                               <p className="text-slate-300 text-sm mb-2 line-clamp-2">

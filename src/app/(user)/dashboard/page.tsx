@@ -66,6 +66,19 @@ export default function Dashboard() {
           throw new Error("Failed to fetch events");
         }
         const data = await response.json();
+        console.log("=== FRONTEND EVENTS FETCH ===");
+        console.log("Events received:", data.events);
+        if (data.events && data.events.length > 0) {
+          console.log("First event departments:", data.events[0].departments);
+          console.log(
+            "Type of first event departments:",
+            typeof data.events[0].departments
+          );
+          console.log(
+            "Is first event departments an array?",
+            Array.isArray(data.events[0].departments)
+          );
+        }
         setEvents(data.events || []);
       } catch (err) {
         console.error("Error fetching events:", err);
@@ -193,11 +206,24 @@ export default function Dashboard() {
       event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (event.location &&
         event.location.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    // Create department mapping for short codes
+    const departmentMap: Record<string, string[]> = {
+      "Computer Science": ["Computer Science", "CS"],
+      "Software Engineering": ["Software Engineering", "SE"],
+      "Information Systems": ["Information Systems", "IS"],
+    };
+
     const matchesDepartment =
       selectedDepartment === "All Departments" ||
       (event.departments &&
         Array.isArray(event.departments) &&
-        event.departments.includes(selectedDepartment));
+        (event.departments.includes(selectedDepartment) ||
+          (departmentMap[selectedDepartment] &&
+            event.departments.some((dept) =>
+              departmentMap[selectedDepartment].includes(dept)
+            ))));
+
     return matchesSearch && matchesDepartment;
   });
 
@@ -430,13 +456,18 @@ export default function Dashboard() {
                           </h3>
                           {event.departments &&
                             Array.isArray(event.departments) && (
-                              <span
-                                className={`px-2 py-1 rounded-full text-xs font-medium text-white ${getDepartmentTagClass(
-                                  event.departments[0]
-                                )}`}
-                              >
-                                {event.departments[0]}
-                              </span>
+                              <div className="flex flex-wrap gap-1">
+                                {event.departments.map((dept, index) => (
+                                  <span
+                                    key={index}
+                                    className={`px-2 py-1 rounded-full text-xs font-medium text-white ${getDepartmentTagClass(
+                                      dept
+                                    )}`}
+                                  >
+                                    {dept}
+                                  </span>
+                                ))}
+                              </div>
                             )}
                         </div>
                         <p className="text-slate-400 text-sm mb-2">
@@ -615,7 +646,12 @@ export default function Dashboard() {
                                   ? getDepartmentTagClass(event.departments[0])
                                   : "bg-blue-500"
                               } text-white`}
-                              title={event.title}
+                              title={`${event.title}${
+                                event.departments &&
+                                Array.isArray(event.departments)
+                                  ? ` - ${event.departments.join(", ")}`
+                                  : ""
+                              }`}
                             >
                               {event.title}
                             </div>
@@ -679,7 +715,12 @@ export default function Dashboard() {
                                   ? getDepartmentTagClass(event.departments[0])
                                   : "bg-blue-500"
                               } text-white`}
-                              title={`${event.title} - ${event.time}`}
+                              title={`${event.title} - ${event.time}${
+                                event.departments &&
+                                Array.isArray(event.departments)
+                                  ? ` - ${event.departments.join(", ")}`
+                                  : ""
+                              }`}
                             >
                               <div className="font-medium truncate">
                                 {event.title}
@@ -810,13 +851,20 @@ export default function Dashboard() {
                                               Array.isArray(
                                                 event.departments
                                               ) && (
-                                                <span
-                                                  className={`px-2 py-1 rounded-full text-xs font-medium text-white ${getDepartmentTagClass(
-                                                    event.departments[0]
-                                                  )}`}
-                                                >
-                                                  {event.departments[0]}
-                                                </span>
+                                                <div className="flex flex-wrap gap-1">
+                                                  {event.departments.map(
+                                                    (dept, index) => (
+                                                      <span
+                                                        key={index}
+                                                        className={`px-2 py-1 rounded-full text-xs font-medium text-white ${getDepartmentTagClass(
+                                                          dept
+                                                        )}`}
+                                                      >
+                                                        {dept}
+                                                      </span>
+                                                    )
+                                                  )}
+                                                </div>
                                               )}
                                           </div>
                                           <p className="text-slate-300 text-sm mb-2 line-clamp-2">
