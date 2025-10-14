@@ -643,7 +643,7 @@ export default function Dashboard() {
                       >
                         <div
                           className={`font-semibold text-sm mb-2 ${
-                            !isCurrentMonth ? "text-gray-400" : "text-gray-900"
+                            !isCurrentMonth ? "text-gray-400" : "text-gray-800"
                           }`}
                         >
                           {day.getDate()}
@@ -716,7 +716,7 @@ export default function Dashboard() {
                       >
                         <div
                           className={`font-semibold text-sm mb-3 ${
-                            isToday ? "text-blue-600" : "text-gray-900"
+                            isToday ? "text-blue-600" : "text-gray-800"
                           }`}
                         >
                           {day.getDate()}

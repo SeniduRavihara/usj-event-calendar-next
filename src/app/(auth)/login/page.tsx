@@ -70,29 +70,29 @@ export default function LoginPage() {
 
   const validateForm = (): boolean => {
     const newErrors: LoginFormErrors = {};
-    
+
     if (!formData.email) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Please enter a valid email";
     }
-    
+
     if (!formData.password) {
       newErrors.password = "Password is required";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
     setErrors({});
-    
+
     try {
       const result = await login(formData.email, formData.password);
 
@@ -101,7 +101,7 @@ export default function LoginPage() {
         const redirectUrl =
           result.user?.role === "ADMIN" ? "/admin" : "/dashboard";
         router.push(redirectUrl);
-        } else {
+      } else {
         setErrors({ api: result.error || "Login failed" });
       }
     } catch {
@@ -128,7 +128,7 @@ export default function LoginPage() {
                 strokeWidth={2}
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
-              </svg>
+            </svg>
           </div>
         </div>
         <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
@@ -137,7 +137,7 @@ export default function LoginPage() {
         <p className="mt-2 text-center text-sm text-gray-600">
           Access the USJ Event Calendar
         </p>
-          </div>
+      </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
@@ -170,7 +170,7 @@ export default function LoginPage() {
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   className={`appearance-none block w-full pl-10 pr-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-gray-900 ${
-                    errors.email 
+                    errors.email
                       ? "border-red-300 focus:ring-red-500 focus:border-red-500"
                       : "border-gray-300"
                   }`}
@@ -205,7 +205,7 @@ export default function LoginPage() {
                     handleInputChange("password", e.target.value)
                   }
                   className={`appearance-none block w-full pl-10 pr-10 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-gray-900 ${
-                    errors.password 
+                    errors.password
                       ? "border-red-300 focus:ring-red-500 focus:border-red-500"
                       : "border-gray-300"
                   }`}
@@ -216,11 +216,11 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
-                    {showPassword ? (
+                  {showPassword ? (
                     <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-500" />
-                    ) : (
+                  ) : (
                     <Eye className="h-5 w-5 text-gray-400 hover:text-gray-500" />
-                    )}
+                  )}
                 </button>
               </div>
               {errors.password && (
@@ -246,7 +246,7 @@ export default function LoginPage() {
                   className="ml-2 block text-sm text-gray-900"
                 >
                   Remember me
-              </label>
+                </label>
               </div>
 
               <div className="text-sm">
@@ -261,14 +261,14 @@ export default function LoginPage() {
 
             {/* Submit Button */}
             <div>
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={isLoading}
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isLoading}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <div className="flex items-center">
+              >
+                {isLoading ? (
+                  <div className="flex items-center">
                     <svg
                       className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
                       xmlns="http://www.w3.org/2000/svg"
@@ -288,14 +288,14 @@ export default function LoginPage() {
                         fill="currentColor"
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
-                  </svg>
+                    </svg>
                     Signing in...
-                </div>
-              ) : (
+                  </div>
+                ) : (
                   "Sign in"
-              )}
-            </button>
-          </div>
+                )}
+              </button>
+            </div>
           </form>
 
           {/* Sign Up Link */}
@@ -306,10 +306,10 @@ export default function LoginPage() {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-white text-gray-500">
-                  Don't have an account?
+                  Don&apos;t have an account?
                 </span>
               </div>
-          </div>
+            </div>
 
             <div className="mt-6">
               <a
