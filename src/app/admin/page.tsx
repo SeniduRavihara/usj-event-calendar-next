@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useAuth } from "../../components/AuthContext";
 import { ProtectedRoute } from "../../components/ProtectedRoute";
 
@@ -58,7 +58,7 @@ interface EventFormData {
   cover_color: string;
 }
 
-export default function AdminDashboard() {
+function AdminDashboardContent() {
   const { user, logout } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1947,5 +1947,19 @@ export default function AdminDashboard() {
         </div>
       )}
     </ProtectedRoute>
+  );
+}
+
+export default function AdminDashboard() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        </div>
+      }
+    >
+      <AdminDashboardContent />
+    </Suspense>
   );
 }
