@@ -17,6 +17,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../components/AuthContext";
 import { ProtectedRoute } from "../../components/ProtectedRoute";
@@ -58,6 +59,8 @@ interface EventFormData {
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   // State management
   const [activeTab, setActiveTab] = useState<"list" | "calendar" | "analytics">(
@@ -190,6 +193,20 @@ export default function AdminDashboard() {
       fetchAnalytics();
     }
   }, [activeTab, analyticsData]);
+
+  // Handle tab query parameter
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab && (tab === "list" || tab === "calendar" || tab === "analytics")) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
+  // Handle tab change with query parameters
+  const handleTabChange = (tab: "list" | "calendar" | "analytics") => {
+    setActiveTab(tab);
+    router.push(`/admin?tab=${tab}`);
+  };
 
   // Notification system
   const [notifications, setNotifications] = useState<
@@ -673,7 +690,7 @@ export default function AdminDashboard() {
             <div className="flex bg-slate-700/50 rounded-2xl p-1">
               <button
                 type="button"
-                onClick={() => setActiveTab("list")}
+                onClick={() => handleTabChange("list")}
                 className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                   activeTab === "list"
                     ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
@@ -685,7 +702,7 @@ export default function AdminDashboard() {
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab("calendar")}
+                onClick={() => handleTabChange("calendar")}
                 className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                   activeTab === "calendar"
                     ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
@@ -697,7 +714,7 @@ export default function AdminDashboard() {
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab("analytics")}
+                onClick={() => handleTabChange("analytics")}
                 className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                   activeTab === "analytics"
                     ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
@@ -1325,19 +1342,6 @@ export default function AdminDashboard() {
                             );
                           })}
                         </div>
-
-                        {/* No events message */}
-                        {getEventsForDate(currentDate).length === 0 && (
-                          <div className="text-center py-12">
-                            <Calendar className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                            <p className="text-slate-400 text-lg">
-                              No events scheduled for this day
-                            </p>
-                            <p className="text-slate-500 text-sm mt-2">
-                              Events will appear on the timeline when scheduled
-                            </p>
-                          </div>
-                        )}
                       </div>
                     </div>
                   )}
@@ -1546,14 +1550,20 @@ export default function AdminDashboard() {
             {/* Sidebar */}
             <aside className="space-y-6">
               {/* Calendar Widget */}
-              <div className="bg-emerald-50 rounded-xl p-6 shadow-lg hover:shadow-xl hover:border-2 hover:border-emerald-500 hover:-translate-y-1 transition-all duration-200 cursor-pointer">
+              <div
+                onClick={() => handleTabChange("calendar")}
+                className="bg-emerald-50 rounded-xl p-6 shadow-lg hover:shadow-xl hover:border-2 hover:border-emerald-500 hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+              >
                 <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-emerald-600" />
                   Quick Calendar
                 </h3>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-purple-600 mb-2">
-                    July 2025
+                    {currentDate.toLocaleDateString("en-US", {
+                      month: "long",
+                      year: "numeric",
+                    })}
                   </div>
                   <p className="text-sm text-slate-400">View full calendar →</p>
                 </div>
