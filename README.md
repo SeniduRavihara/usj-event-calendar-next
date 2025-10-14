@@ -1,6 +1,6 @@
 # 🎓 USJ Event Calendar System
 
-A modern, full-stack event management system for the University of Sri Jayewardenepura, built with Next.js 15, featuring role-based authentication, real-time event management, and a beautiful dark theme UI.
+A modern, full-stack event management system for the University of Sri Jayewardenepura, built with Next.js 15, featuring role-based authentication, real-time event management, and a beautiful light theme UI.
 
 ## 📋 **Technical Overview**
 
@@ -176,7 +176,7 @@ model Event {
 
 **Authentication UI:**
 
-- **Login/Register Forms** - Modern dark theme
+- **Login/Register Forms** - Modern light theme
 - **Password Strength** - Real-time validation
 - **Form Validation** - Client-side error handling
 - **Loading States** - User feedback during operations
@@ -342,7 +342,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 - ✅ Responsive design with Tailwind CSS
 - ✅ Type-safe development with TypeScript
 - ✅ Database migrations with Prisma
-- ✅ Modern dark theme UI
+- ✅ Modern light theme UI
 - ✅ Real-time data updates
 
 ## 🛠️ Development
@@ -399,5 +399,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For support, email your-email@example.com or create an issue in the repository.
 
 ---
-
-**Built with ❤️ for the University of Sri Jayewardenepura**
