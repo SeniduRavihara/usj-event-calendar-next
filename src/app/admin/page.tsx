@@ -17,7 +17,9 @@ import {
   Users,
   X,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { Suspense, useEffect, useState } from "react";
 import { useAuth } from "../../components/AuthContext";
 import { ProtectedRoute } from "../../components/ProtectedRoute";
 
@@ -56,8 +58,10 @@ interface EventFormData {
   cover_color: string;
 }
 
-export default function AdminDashboard() {
+function AdminDashboardContent() {
   const { user, logout } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   // State management
   const [activeTab, setActiveTab] = useState<"list" | "calendar" | "analytics">(
@@ -190,6 +194,20 @@ export default function AdminDashboard() {
       fetchAnalytics();
     }
   }, [activeTab, analyticsData]);
+
+  // Handle tab query parameter
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab && (tab === "list" || tab === "calendar" || tab === "analytics")) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
+  // Handle tab change with query parameters
+  const handleTabChange = (tab: "list" | "calendar" | "analytics") => {
+    setActiveTab(tab);
+    router.push(`/admin?tab=${tab}`);
+  };
 
   // Notification system
   const [notifications, setNotifications] = useState<
@@ -551,7 +569,7 @@ export default function AdminDashboard() {
 
   return (
     <ProtectedRoute requiredRole="ADMIN">
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="min-h-screen bg-gray-50">
         {/* Notifications */}
         <div className="fixed top-4 right-4 z-50 space-y-2">
           {notifications.map((notification) => (
@@ -569,33 +587,36 @@ export default function AdminDashboard() {
         </div>
 
         {/* Header */}
-        <header className="bg-slate-800/80 backdrop-blur-xl border-b border-slate-700/50 px-4 lg:px-8 py-4 flex justify-between items-center">
+        <header className="bg-white border-b border-gray-200 px-4 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white">
+            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white">
               <Calendar className="w-6 h-6" />
             </div>
             <div className="flex flex-col">
-              <div className="text-base font-semibold text-white">
+              <div className="text-base font-semibold text-gray-900">
                 Faculty Events Admin
               </div>
-              <div className="text-xs text-slate-300 hidden sm:block">
+              <div className="text-xs text-gray-500 hidden sm:block">
                 University of Sri Jayewardenepura
               </div>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="w-8 h-8 bg-slate-700/50 rounded-full flex items-center justify-center text-slate-300 hover:bg-slate-600/50 transition-colors cursor-pointer">
+              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors cursor-pointer">
                 <Bell className="w-4 h-4" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
               </div>
             </div>
-            <div className="w-8 h-8 bg-slate-700/50 rounded-full flex items-center justify-center text-slate-300 hover:bg-slate-600/50 transition-colors cursor-pointer">
+            <Link
+              href="/admin/profile"
+              className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors cursor-pointer"
+            >
               <User className="w-4 h-4" />
-            </div>
+            </Link>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-red-500/25"
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
             >
               Logout
             </button>
@@ -606,16 +627,16 @@ export default function AdminDashboard() {
         <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
           {/* Welcome Section */}
           <section className="mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
               Welcome back, {user?.name || "Admin"}!
-              <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+              <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
                 ● Admin
               </span>
-              <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+              <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
                 ● {events.length} events
               </span>
             </h1>
-            <p className="text-slate-300 max-w-2xl">
+            <p className="text-gray-600 max-w-2xl">
               Manage events, workshops, and activities across Computer Science,
               Software Engineering, and Information Systems departments.
             </p>
@@ -623,46 +644,46 @@ export default function AdminDashboard() {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <div className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 hover:-translate-y-2 hover:border-purple-500/50 cursor-pointer">
+            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-3xl font-bold text-white mb-1">
+                  <h3 className="text-3xl font-bold text-gray-900 mb-1">
                     {events.length}
                   </h3>
-                  <p className="text-slate-300 text-sm">Total events</p>
+                  <p className="text-gray-600 text-sm">Total events</p>
                 </div>
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white shadow-lg">
-                  <Calendar className="w-6 h-6" />
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Calendar className="w-6 h-6 text-blue-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 hover:-translate-y-2 hover:border-purple-500/50 cursor-pointer">
+            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-3xl font-bold text-white mb-1">
+                  <h3 className="text-3xl font-bold text-gray-900 mb-1">
                     {filteredEvents.length}
                   </h3>
-                  <p className="text-slate-300 text-sm">Filtered events</p>
+                  <p className="text-gray-600 text-sm">Filtered events</p>
                 </div>
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-white shadow-lg">
-                  <Users className="w-6 h-6" />
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Users className="w-6 h-6 text-green-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 hover:-translate-y-2 hover:border-purple-500/50 cursor-pointer">
+            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-3xl font-bold text-white mb-1">
+                  <h3 className="text-3xl font-bold text-gray-900 mb-1">
                     {user?.department || "N/A"}
                   </h3>
-                  <p className="text-slate-300 text-sm">
+                  <p className="text-gray-600 text-sm">
                     {user?.student_id || "Admin"}
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center text-white shadow-lg">
-                  <GraduationCap className="w-6 h-6" />
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <GraduationCap className="w-6 h-6 text-orange-600" />
                 </div>
               </div>
             </div>
@@ -670,14 +691,14 @@ export default function AdminDashboard() {
 
           {/* Tab Navigation */}
           <div className="mt-8 mb-8">
-            <div className="flex bg-slate-700/50 rounded-2xl p-1">
+            <div className="flex bg-gray-100 rounded-lg p-1">
               <button
                 type="button"
-                onClick={() => setActiveTab("list")}
-                className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                onClick={() => handleTabChange("list")}
+                className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                   activeTab === "list"
-                    ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
-                    : "text-slate-400 hover:text-white"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
                 }`}
               >
                 <List className="w-5 h-5" />
@@ -685,11 +706,11 @@ export default function AdminDashboard() {
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab("calendar")}
-                className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                onClick={() => handleTabChange("calendar")}
+                className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                   activeTab === "calendar"
-                    ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
-                    : "text-slate-400 hover:text-white"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
                 }`}
               >
                 <CalendarDays className="w-5 h-5" />
@@ -697,11 +718,11 @@ export default function AdminDashboard() {
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab("analytics")}
-                className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                onClick={() => handleTabChange("analytics")}
+                className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                   activeTab === "analytics"
-                    ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg"
-                    : "text-slate-400 hover:text-white"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
                 }`}
               >
                 <Users className="w-5 h-5" />
@@ -715,14 +736,14 @@ export default function AdminDashboard() {
             {/* Events Section */}
             <div className="lg:col-span-2">
               {activeTab === "list" ? (
-                <section className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl">
+                <section className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                   {/* Admin Panel */}
-                  <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-xl p-4 mb-6 backdrop-blur-sm">
-                    <h3 className="text-orange-400 font-medium text-sm mb-2 flex items-center gap-2">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <h3 className="text-blue-700 font-medium text-sm mb-2 flex items-center gap-2">
                       <Plus className="w-4 h-4" />
                       Admin Controls
                     </h3>
-                    <p className="text-orange-300 text-xs">
+                    <p className="text-blue-600 text-xs">
                       You have full access to create, edit, and delete events.
                       Changes will be reflected immediately.
                     </p>
@@ -732,7 +753,7 @@ export default function AdminDashboard() {
                   <div className="flex justify-between items-center mb-6">
                     <button
                       onClick={openCreateModal}
-                      className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-6 py-3 rounded-xl font-medium transition-all hover:-translate-y-1 shadow-lg hover:shadow-emerald-500/25"
+                      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-sm"
                     >
                       <Plus className="w-4 h-4" />
                       Create Event
@@ -742,21 +763,21 @@ export default function AdminDashboard() {
                   {/* Search and Filter */}
                   <div className="flex flex-col sm:flex-row gap-4 mb-6">
                     <div className="relative flex-1">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <input
                         type="text"
                         placeholder="Search events..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors bg-slate-700/50 text-white placeholder-slate-400"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900 placeholder-gray-400"
                       />
                     </div>
                     <div className="relative">
-                      <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                      <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <select
                         value={departmentFilter}
                         onChange={(e) => setDepartmentFilter(e.target.value)}
-                        className="pl-10 pr-8 py-3 border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors bg-slate-700/50 text-white min-w-[200px]"
+                        className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900 min-w-[200px]"
                       >
                         <option value="all">All Departments</option>
                         <option value="Computer Science">
@@ -772,7 +793,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
-                  <h2 className="text-xl font-semibold text-white mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">
                     Upcoming Events
                   </h2>
 
@@ -781,7 +802,7 @@ export default function AdminDashboard() {
                     {loading ? (
                       <div className="text-center py-8">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                        <p className="mt-4 text-slate-400">Loading events...</p>
+                        <p className="mt-4 text-gray-600">Loading events...</p>
                       </div>
                     ) : error ? (
                       <div className="text-center py-8">
@@ -806,15 +827,15 @@ export default function AdminDashboard() {
                         return (
                           <div
                             key={event.id}
-                            className="bg-slate-700/50 border border-slate-600/50 rounded-2xl p-6 hover:shadow-lg hover:border-purple-500/50 hover:-translate-y-1 transition-all duration-200 backdrop-blur-sm"
+                            className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md hover:border-blue-300 transition-all duration-200"
                           >
                             <div className="flex items-start gap-4">
-                              <div className="w-12 h-12 bg-slate-600/50 rounded-xl flex items-center justify-center text-slate-400 flex-shrink-0 border border-slate-500/50">
+                              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 flex-shrink-0">
                                 {departmentInfo.icon}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-3 mb-2">
-                                  <h3 className="text-lg font-semibold text-white truncate">
+                                  <h3 className="text-lg font-semibold text-gray-900 truncate">
                                     {event.title}
                                   </h3>
                                   <div className="flex flex-wrap gap-1">
@@ -842,10 +863,10 @@ export default function AdminDashboard() {
                                     )}
                                   </div>
                                 </div>
-                                <p className="text-slate-300 text-sm mb-3">
+                                <p className="text-gray-600 text-sm mb-3">
                                   {event.description}
                                 </p>
-                                <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400 mb-4">
+                                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
                                   <div className="flex items-center gap-1">
                                     <Calendar className="w-4 h-4" />
                                     <span>
@@ -886,14 +907,14 @@ export default function AdminDashboard() {
                             <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100">
                               <button
                                 onClick={() => viewEvent(event)}
-                                className="flex items-center gap-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-all hover:-translate-y-1"
+                                className="flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
                               >
                                 <Eye className="w-4 h-4" />
                                 View Details
                               </button>
                               <button
                                 onClick={() => openEditModal(event)}
-                                className="flex items-center gap-1 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium transition-all hover:-translate-y-1 hover:shadow-lg"
+                                className="flex items-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
                                 title="Edit this event"
                               >
                                 <Edit className="w-4 h-4" />
@@ -902,10 +923,10 @@ export default function AdminDashboard() {
                               <button
                                 onClick={() => deleteEvent(event.id)}
                                 disabled={deletingEventId === event.id}
-                                className={`flex items-center gap-1 px-3 py-2 text-white rounded-lg text-sm font-medium transition-all hover:-translate-y-1 hover:shadow-lg ${
+                                className={`flex items-center gap-1 px-3 py-2 text-white rounded-lg text-sm font-medium transition-colors ${
                                   deletingEventId === event.id
                                     ? "bg-red-400 cursor-not-allowed"
-                                    : "bg-red-500 hover:bg-red-600"
+                                    : "bg-red-600 hover:bg-red-700"
                                 }`}
                                 title="Delete this event"
                               >
@@ -926,14 +947,14 @@ export default function AdminDashboard() {
                   </div>
                 </section>
               ) : activeTab === "calendar" ? (
-                <section className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl">
+                <section className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                   {/* Admin Panel */}
-                  <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-xl p-4 mb-6 backdrop-blur-sm">
-                    <h3 className="text-orange-400 font-medium text-sm mb-2 flex items-center gap-2">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <h3 className="text-blue-700 font-medium text-sm mb-2 flex items-center gap-2">
                       <Plus className="w-4 h-4" />
                       Admin Controls
                     </h3>
-                    <p className="text-orange-300 text-xs">
+                    <p className="text-blue-600 text-xs">
                       You have full access to create, edit, and delete events.
                       Changes will be reflected immediately.
                     </p>
@@ -941,7 +962,7 @@ export default function AdminDashboard() {
 
                   {/* Calendar Header with View Toggle */}
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-semibold text-white">
+                    <h2 className="text-2xl font-semibold text-gray-900">
                       {calendarView === "month"
                         ? currentDate.toLocaleDateString("en-US", {
                             month: "long",
@@ -963,33 +984,33 @@ export default function AdminDashboard() {
                     </h2>
                     <div className="flex items-center gap-4">
                       {/* View Toggle Buttons */}
-                      <div className="flex bg-slate-700/50 rounded-xl p-1">
+                      <div className="flex bg-gray-100 rounded-lg p-1">
                         <button
                           onClick={() => setCalendarView("month")}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                             calendarView === "month"
-                              ? "bg-purple-500 text-white"
-                              : "text-slate-400 hover:text-white"
+                              ? "bg-blue-600 text-white"
+                              : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
                           }`}
                         >
                           Month
                         </button>
                         <button
                           onClick={() => setCalendarView("week")}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                             calendarView === "week"
-                              ? "bg-purple-500 text-white"
-                              : "text-slate-400 hover:text-white"
+                              ? "bg-blue-600 text-white"
+                              : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
                           }`}
                         >
                           Week
                         </button>
                         <button
                           onClick={() => setCalendarView("day")}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                             calendarView === "day"
-                              ? "bg-purple-500 text-white"
-                              : "text-slate-400 hover:text-white"
+                              ? "bg-blue-600 text-white"
+                              : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
                           }`}
                         >
                           Day
@@ -1000,19 +1021,19 @@ export default function AdminDashboard() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => navigateDate("prev")}
-                          className="p-3 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white hover:bg-slate-700/70 hover:border-purple-500/50 transition-all"
+                          className="p-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-blue-500 transition-colors"
                         >
                           ←
                         </button>
                         <button
                           onClick={() => setCurrentDate(new Date())}
-                          className="px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white hover:bg-slate-700/70 hover:border-purple-500/50 transition-all text-sm font-medium"
+                          className="px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-blue-500 transition-colors text-sm font-medium"
                         >
                           Today
                         </button>
                         <button
                           onClick={() => navigateDate("next")}
-                          className="p-3 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white hover:bg-slate-700/70 hover:border-purple-500/50 transition-all"
+                          className="p-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-blue-500 transition-colors"
                         >
                           →
                         </button>
@@ -1022,13 +1043,13 @@ export default function AdminDashboard() {
 
                   {/* Calendar Content - Conditional Rendering */}
                   {calendarView === "month" ? (
-                    <div className="grid grid-cols-7 gap-1 bg-slate-700/30 rounded-xl p-2">
+                    <div className="grid grid-cols-7 gap-1 bg-gray-50 rounded-lg p-2">
                       {/* Day headers */}
                       {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
                         (day) => (
                           <div
                             key={day}
-                            className="p-2 text-center text-sm font-medium text-slate-400"
+                            className="p-2 text-center text-sm font-medium text-gray-600"
                           >
                             {day}
                           </div>
@@ -1095,13 +1116,13 @@ export default function AdminDashboard() {
                       })}
                     </div>
                   ) : calendarView === "week" ? (
-                    <div className="grid grid-cols-7 gap-1 bg-slate-700/30 rounded-xl p-2">
+                    <div className="grid grid-cols-7 gap-1 bg-gray-50 rounded-lg p-2">
                       {/* Day headers */}
                       {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
                         (day) => (
                           <div
                             key={day}
-                            className="p-2 text-center text-sm font-medium text-slate-400"
+                            className="p-2 text-center text-sm font-medium text-gray-600"
                           >
                             {day}
                           </div>
@@ -1150,9 +1171,9 @@ export default function AdminDashboard() {
                       })}
                     </div>
                   ) : (
-                    <div className="bg-slate-700/30 rounded-xl p-6">
+                    <div className="bg-gray-50 rounded-lg p-6">
                       <div className="text-center mb-6">
-                        <h3 className="text-xl font-semibold text-white mb-2">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
                           {currentDate.toLocaleDateString("en-US", {
                             weekday: "long",
                             month: "long",
@@ -1160,7 +1181,7 @@ export default function AdminDashboard() {
                             year: "numeric",
                           })}
                         </h3>
-                        <p className="text-slate-400">
+                        <p className="text-gray-600">
                           {getEventsForDate(currentDate).length} events
                           scheduled
                         </p>
@@ -1181,7 +1202,7 @@ export default function AdminDashboard() {
                           const currentHour = currentTime.getHours();
                           const currentMinute = currentTime.getMinutes();
                           const currentTimePosition =
-                            (currentHour + currentMinute / 60) * 60; // 60px per hour
+                            (currentHour + currentMinute / 60) * 40; // 40px per hour
 
                           return (
                             <div
@@ -1221,11 +1242,11 @@ export default function AdminDashboard() {
                             return (
                               <div
                                 key={hour}
-                                className="relative flex items-start min-h-[60px]"
+                                className="relative flex items-start min-h-[40px]"
                               >
                                 {/* Hour Label */}
                                 <div className="w-20 text-right pr-4 pt-2 flex-shrink-0">
-                                  <span className="text-sm text-slate-400 font-medium">
+                                  <span className="text-sm text-gray-600 font-medium">
                                     {hour === 0
                                       ? "12 AM"
                                       : hour < 12
@@ -1236,16 +1257,13 @@ export default function AdminDashboard() {
                                   </span>
                                 </div>
 
-                                {/* Timeline Dot */}
-                                <div className="absolute left-18 w-3 h-3 bg-slate-600 rounded-full border-2 border-slate-700 -translate-x-1/2 top-2"></div>
-
                                 {/* Hour Grid Line */}
-                                <div className="absolute left-20 right-0 h-px bg-slate-700/30 top-7"></div>
+                                <div className="absolute left-20 right-0 h-px bg-slate-700/30 top-5"></div>
 
                                 {/* Events for this hour */}
-                                <div className="ml-8 flex-1 min-h-[60px] relative">
+                                <div className="ml-8 flex-1 min-h-[40px] relative">
                                   {hourEvents.length === 0 ? (
-                                    <div className="h-12"></div>
+                                    <div className="h-8"></div>
                                   ) : (
                                     <div className="space-y-2">
                                       {hourEvents.map((event) => (
@@ -1260,7 +1278,7 @@ export default function AdminDashboard() {
                                             </div>
                                             <div className="flex-1 min-w-0">
                                               <div className="flex items-center gap-2 mb-1">
-                                                <h4 className="font-semibold text-white truncate">
+                                                <h4 className="font-semibold text-gray-900 truncate">
                                                   {event.title}
                                                 </h4>
                                                 {event.departments &&
@@ -1281,10 +1299,10 @@ export default function AdminDashboard() {
                                                     </div>
                                                   )}
                                               </div>
-                                              <p className="text-slate-300 text-sm mb-2 line-clamp-2">
+                                              <p className="text-gray-600 text-sm mb-2 line-clamp-2">
                                                 {event.description}
                                               </p>
-                                              <div className="flex items-center gap-4 text-xs text-slate-400">
+                                              <div className="flex items-center gap-4 text-xs text-gray-500">
                                                 <span className="flex items-center gap-1">
                                                   <Calendar className="w-3 h-3" />
                                                   {event.time}
@@ -1325,32 +1343,19 @@ export default function AdminDashboard() {
                             );
                           })}
                         </div>
-
-                        {/* No events message */}
-                        {getEventsForDate(currentDate).length === 0 && (
-                          <div className="text-center py-12">
-                            <Calendar className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                            <p className="text-slate-400 text-lg">
-                              No events scheduled for this day
-                            </p>
-                            <p className="text-slate-500 text-sm mt-2">
-                              Events will appear on the timeline when scheduled
-                            </p>
-                          </div>
-                        )}
                       </div>
                     </div>
                   )}
                 </section>
               ) : activeTab === "analytics" ? (
-                <section className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 shadow-2xl">
+                <section className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                   {/* Analytics Header */}
                   <div className="mb-6">
-                    <h2 className="text-2xl font-semibold text-white mb-2 flex items-center gap-3">
+                    <h2 className="text-2xl font-semibold text-gray-900 mb-2 flex items-center gap-3">
                       <Users className="w-6 h-6" />
                       User Analytics
                     </h2>
-                    <p className="text-slate-400">
+                    <p className="text-gray-600">
                       Overview of all users and their statistics
                     </p>
                   </div>
@@ -1358,10 +1363,8 @@ export default function AdminDashboard() {
                   {/* Analytics Content */}
                   {analyticsLoading ? (
                     <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-                      <p className="mt-4 text-slate-400">
-                        Loading analytics...
-                      </p>
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                      <p className="mt-4 text-gray-600">Loading analytics...</p>
                     </div>
                   ) : analyticsData ? (
                     <div className="space-y-6">
@@ -1374,7 +1377,7 @@ export default function AdminDashboard() {
                             </h3>
                             <Users className="w-5 h-5 text-blue-400" />
                           </div>
-                          <p className="text-3xl font-bold text-white">
+                          <p className="text-3xl font-bold text-gray-900">
                             {analyticsData.statistics.totalUsers}
                           </p>
                         </div>
@@ -1386,7 +1389,7 @@ export default function AdminDashboard() {
                             </h3>
                             <GraduationCap className="w-5 h-5 text-green-400" />
                           </div>
-                          <p className="text-3xl font-bold text-white">
+                          <p className="text-3xl font-bold text-gray-900">
                             {analyticsData.statistics.totalStudents}
                           </p>
                         </div>
@@ -1398,7 +1401,7 @@ export default function AdminDashboard() {
                             </h3>
                             <User className="w-5 h-5 text-purple-400" />
                           </div>
-                          <p className="text-3xl font-bold text-white">
+                          <p className="text-3xl font-bold text-gray-900">
                             {analyticsData.statistics.totalAdmins}
                           </p>
                         </div>
@@ -1410,7 +1413,7 @@ export default function AdminDashboard() {
                             </h3>
                             <Users className="w-5 h-5 text-orange-400" />
                           </div>
-                          <p className="text-3xl font-bold text-white">
+                          <p className="text-3xl font-bold text-gray-900">
                             {analyticsData.statistics.recentUsers}
                           </p>
                         </div>
@@ -1422,15 +1425,15 @@ export default function AdminDashboard() {
                             </h3>
                             <GraduationCap className="w-5 h-5 text-pink-400" />
                           </div>
-                          <p className="text-3xl font-bold text-white">
+                          <p className="text-3xl font-bold text-gray-900">
                             {analyticsData.statistics.usersWithStudentId}
                           </p>
                         </div>
                       </div>
 
                       {/* Users by Department */}
-                      <div className="bg-slate-700/50 border border-slate-600/50 rounded-xl p-6">
-                        <h3 className="text-lg font-semibold text-white mb-4">
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
                           Users by Department
                         </h3>
                         <div className="space-y-3">
@@ -1438,12 +1441,12 @@ export default function AdminDashboard() {
                             (dept: { department: string; count: number }) => (
                               <div
                                 key={dept.department}
-                                className="flex items-center justify-between p-3 bg-slate-600/30 rounded-lg"
+                                className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg"
                               >
-                                <span className="text-slate-300">
+                                <span className="text-gray-900">
                                   {dept.department}
                                 </span>
-                                <span className="text-white font-semibold">
+                                <span className="text-gray-900 font-semibold">
                                   {dept.count} users
                                 </span>
                               </div>
@@ -1453,30 +1456,30 @@ export default function AdminDashboard() {
                       </div>
 
                       {/* All Users Table */}
-                      <div className="bg-slate-700/50 border border-slate-600/50 rounded-xl p-6">
-                        <h3 className="text-lg font-semibold text-white mb-4">
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
                           All Users
                         </h3>
                         <div className="overflow-x-auto">
                           <table className="w-full">
                             <thead>
-                              <tr className="border-b border-slate-600">
-                                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">
+                              <tr className="border-b border-gray-200">
+                                <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
                                   Name
                                 </th>
-                                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">
+                                <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
                                   Email
                                 </th>
-                                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">
+                                <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
                                   Role
                                 </th>
-                                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">
+                                <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
                                   Department
                                 </th>
-                                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">
+                                <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
                                   Student ID
                                 </th>
-                                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">
+                                <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
                                   Joined
                                 </th>
                               </tr>
@@ -1494,12 +1497,12 @@ export default function AdminDashboard() {
                                 }) => (
                                   <tr
                                     key={user.id}
-                                    className="border-b border-slate-600/50 hover:bg-slate-600/20"
+                                    className="border-b border-gray-200 hover:bg-gray-50"
                                   >
-                                    <td className="py-3 px-4 text-sm text-white">
+                                    <td className="py-3 px-4 text-sm text-gray-900">
                                       {user.name}
                                     </td>
-                                    <td className="py-3 px-4 text-sm text-slate-300">
+                                    <td className="py-3 px-4 text-sm text-gray-600">
                                       {user.email}
                                     </td>
                                     <td className="py-3 px-4">
@@ -1513,13 +1516,13 @@ export default function AdminDashboard() {
                                         {user.role}
                                       </span>
                                     </td>
-                                    <td className="py-3 px-4 text-sm text-slate-300">
+                                    <td className="py-3 px-4 text-sm text-gray-600">
                                       {user.department || "-"}
                                     </td>
-                                    <td className="py-3 px-4 text-sm text-slate-300">
+                                    <td className="py-3 px-4 text-sm text-gray-600">
                                       {user.student_id || "-"}
                                     </td>
-                                    <td className="py-3 px-4 text-sm text-slate-400">
+                                    <td className="py-3 px-4 text-sm text-gray-600">
                                       {new Date(
                                         user.created_at
                                       ).toLocaleDateString()}
@@ -1546,16 +1549,22 @@ export default function AdminDashboard() {
             {/* Sidebar */}
             <aside className="space-y-6">
               {/* Calendar Widget */}
-              <div className="bg-emerald-50 rounded-xl p-6 shadow-lg hover:shadow-xl hover:border-2 hover:border-emerald-500 hover:-translate-y-1 transition-all duration-200 cursor-pointer">
+              <div
+                onClick={() => handleTabChange("calendar")}
+                className="bg-emerald-50 rounded-xl p-6 shadow-lg hover:shadow-xl hover:border-2 hover:border-emerald-500 hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+              >
                 <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-emerald-600" />
                   Quick Calendar
                 </h3>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-purple-600 mb-2">
-                    July 2025
+                    {currentDate.toLocaleDateString("en-US", {
+                      month: "long",
+                      year: "numeric",
+                    })}
                   </div>
-                  <p className="text-sm text-slate-400">View full calendar →</p>
+                  <p className="text-sm text-gray-600">View full calendar →</p>
                 </div>
               </div>
 
@@ -1572,7 +1581,7 @@ export default function AdminDashboard() {
                         Computer Science
                       </span>
                     </div>
-                    <span className="text-xs text-slate-400 bg-slate-700/30 px-2 py-1 rounded-full">
+                    <span className="text-xs text-gray-600 bg-gray-200 px-2 py-1 rounded-full">
                       {departmentCounts["Computer Science"] || 0} events
                     </span>
                   </div>
@@ -1583,7 +1592,7 @@ export default function AdminDashboard() {
                         Software Engineering
                       </span>
                     </div>
-                    <span className="text-xs text-slate-400 bg-slate-700/30 px-2 py-1 rounded-full">
+                    <span className="text-xs text-gray-600 bg-gray-200 px-2 py-1 rounded-full">
                       {departmentCounts["Software Engineering"] || 0} events
                     </span>
                   </div>
@@ -1594,7 +1603,7 @@ export default function AdminDashboard() {
                         Information Systems
                       </span>
                     </div>
-                    <span className="text-xs text-slate-400 bg-slate-700/30 px-2 py-1 rounded-full">
+                    <span className="text-xs text-gray-600 bg-gray-200 px-2 py-1 rounded-full">
                       {departmentCounts["Information Systems"] || 0} events
                     </span>
                   </div>
@@ -1835,32 +1844,32 @@ export default function AdminDashboard() {
       {/* Event Details Modal */}
       {showEventModal && selectedEvent && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">
+                <h2 className="text-2xl font-bold text-gray-900">
                   {selectedEvent.title}
                 </h2>
                 <button
                   onClick={() => setShowEventModal(false)}
-                  className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <X className="w-5 h-5 text-slate-400" />
+                  <X className="w-5 h-5 text-gray-600" />
                 </button>
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center gap-2 text-slate-300">
+                <div className="flex items-center gap-2 text-gray-600">
                   <Calendar className="w-4 h-4" />
                   <span>{formatDate(selectedEvent.date)}</span>
                 </div>
 
-                <div className="flex items-center gap-2 text-slate-300">
+                <div className="flex items-center gap-2 text-gray-600">
                   <Calendar className="w-4 h-4" />
                   <span>{selectedEvent.time}</span>
                 </div>
 
-                <div className="flex items-center gap-2 text-slate-300">
+                <div className="flex items-center gap-2 text-gray-600">
                   <MapPin className="w-4 h-4" />
                   <span>{selectedEvent.location}</span>
                 </div>
@@ -1882,18 +1891,18 @@ export default function AdminDashboard() {
                     </div>
                   )}
 
-                <div className="pt-4 border-t border-slate-700">
-                  <h3 className="text-lg font-semibold text-white mb-2">
+                <div className="pt-4 border-t border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
                     Description
                   </h3>
-                  <p className="text-slate-300 leading-relaxed">
+                  <p className="text-gray-600 leading-relaxed">
                     {selectedEvent.description}
                   </p>
                 </div>
 
                 {selectedEvent.registration_needed &&
                   selectedEvent.registration_link && (
-                    <div className="pt-4 border-t border-slate-700">
+                    <div className="pt-4 border-t border-gray-200">
                       <a
                         href={selectedEvent.registration_link}
                         target="_blank"
@@ -1905,7 +1914,7 @@ export default function AdminDashboard() {
                     </div>
                   )}
 
-                <div className="pt-4 border-t border-slate-700">
+                <div className="pt-4 border-t border-gray-200">
                   <h3 className="text-lg font-semibold text-white mb-2">
                     Event Actions
                   </h3>
@@ -1938,5 +1947,19 @@ export default function AdminDashboard() {
         </div>
       )}
     </ProtectedRoute>
+  );
+}
+
+export default function AdminDashboard() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        </div>
+      }
+    >
+      <AdminDashboardContent />
+    </Suspense>
   );
 }
