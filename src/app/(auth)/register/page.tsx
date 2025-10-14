@@ -345,7 +345,7 @@ export default function SignupPage() {
                   onChange={(e) =>
                     handleInputChange("department", e.target.value)
                   }
-                  className={`mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+                  className={`mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-gray-900 bg-white ${
                     errors.department
                       ? "border-red-300 focus:ring-red-500 focus:border-red-500"
                       : "border-gray-300"
