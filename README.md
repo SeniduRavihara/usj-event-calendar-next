@@ -1,6 +1,6 @@
 # 🎓 USJ Event Calendar System
 
-A modern, full-stack event management system for the University of Sri Jayewardenepura, built with Next.js 15, featuring role-based authentication, real-time event management, and a beautiful light theme UI.
+A modern, full-stack event management system for the University of Sri Jayewardenepura, built with Next.js 15, featuring role-based authentication, real-time event management, and a beautiful dark theme UI.
 
 ## 📋 **Technical Overview**
 
@@ -18,8 +18,8 @@ A modern, full-stack event management system for the University of Sri Jayewarde
 **UI & Styling:**
 
 - **Tailwind CSS** - Utility-first CSS framework for responsive design
-- **Lucide React** - Modern icon library (replaced Unicode icons)
-- **CSS-in-JS** - Styled components with Tailwind classes
+- **Lucide React** - Modern icon library with consistent styling
+- **Professional Light Theme** - Clean, university-appropriate design
 - **Responsive Design** - Mobile-first approach with breakpoints
 
 **State Management:**
@@ -31,7 +31,7 @@ A modern, full-stack event management system for the University of Sri Jayewarde
 **Routing & Navigation:**
 
 - **Next.js App Router** - File-based routing system
-- **Protected Routes** - Role-based access control
+- **Protected Routes** - Role-based access control with Suspense boundaries
 - **Client-side Navigation** - Smooth page transitions
 
 ### **🔐 Authentication System**
@@ -94,8 +94,8 @@ model Event {
   id                  Int      @id @default(autoincrement())
   title               String
   description         String
-  event_date          DateTime
-  event_time          DateTime
+  date                String   // YYYY-MM-DD format
+  time                String   // HH:MM format
   location            String
   departments         Json
   registration_needed Boolean  @default(false)
@@ -121,11 +121,15 @@ model Event {
   - `PUT /api/auth/me` - Update user profile
 
 - **Event Management Routes:**
+
   - `GET /api/events` - List all events
   - `POST /api/events` - Create new event (Admin only)
   - `GET /api/events/[id]` - Get single event
   - `PUT /api/events/[id]` - Update event (Admin only)
   - `DELETE /api/events/[id]` - Delete event (Admin only)
+
+- **Analytics Routes:**
+  - `GET /api/analytics/users` - User statistics (Admin only)
 
 **API Features:**
 
@@ -161,25 +165,35 @@ model Event {
 
 **Dashboard Components:**
 
-- **Event List View** - Paginated event display
-- **Calendar View** - Monthly calendar with events
-- **Search & Filter** - Real-time event filtering
-- **Statistics Cards** - Event counts and metrics
+- **Event List View** - Paginated event display with search and filtering
+- **Calendar View** - Month, Week, and Day views with timeline
+- **Search & Filter** - Real-time event filtering by department
+- **Statistics Cards** - Event counts and user metrics
 - **Responsive Design** - Mobile-optimized layout
 
 **Admin Features:**
 
-- **Event Management** - CRUD operations
-- **User Management** - User profile updates
-- **Department Filtering** - CS, SE, IS departments
+- **Event Management** - Full CRUD operations with modal forms
+- **User Management** - User profile updates and analytics
+- **Department Filtering** - CS, SE, IS departments with proper mapping
 - **Real-time Updates** - Dynamic data refresh
+- **Analytics Dashboard** - User statistics and department breakdowns
+- **Admin Profile Management** - Dedicated admin profile page
+
+**User Features:**
+
+- **Event Browsing** - Department-specific event filtering
+- **Calendar Integration** - Interactive calendar with event popups
+- **Profile Management** - User profile updates
+- **Event Registration** - Registration links when required
 
 **Authentication UI:**
 
-- **Login/Register Forms** - Modern light theme
+- **Login/Register Forms** - Modern dark theme
 - **Password Strength** - Real-time validation
 - **Form Validation** - Client-side error handling
 - **Loading States** - User feedback during operations
+- **Department Selection** - Dropdown with all available departments
 
 ### **🔄 Data Flow**
 
@@ -242,11 +256,22 @@ model Event {
 src/
 ├── app/                    # Next.js App Router
 │   ├── (auth)/            # Authentication pages
+│   │   ├── login/         # Login page
+│   │   └── register/      # Registration page
 │   ├── (user)/            # User dashboard pages
+│   │   ├── dashboard/     # User dashboard
+│   │   └── profile/       # User profile
 │   ├── admin/             # Admin dashboard
+│   │   └── profile/       # Admin profile
 │   ├── api/               # API routes
+│   │   ├── auth/          # Authentication endpoints
+│   │   ├── events/        # Event management endpoints
+│   │   └── analytics/     # Analytics endpoints
+│   ├── calendar/          # Main calendar page
 │   └── lib/               # Utility functions
 ├── components/            # React components
+│   ├── AuthContext.tsx    # Authentication context
+│   └── ProtectedRoute.tsx # Route protection
 └── prisma/               # Database schema & migrations
 ```
 
@@ -321,29 +346,50 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 ### **User Features**
 
 - ✅ User registration and authentication
-- ✅ Profile management
-- ✅ Event browsing and filtering
-- ✅ Calendar view of events
-- ✅ Department-specific event filtering
-- ✅ Event registration (when required)
+- ✅ Profile management with department selection
+- ✅ Event browsing and filtering by department
+- ✅ Interactive calendar with month, week, and day views
+- ✅ Event popup details on calendar click
+- ✅ Department-specific event filtering (CS, SE, IS)
+- ✅ Event registration links (when required)
+- ✅ Professional light theme UI
 
 ### **Admin Features**
 
-- ✅ Full event management (CRUD)
-- ✅ User management
+- ✅ Full event management (CRUD operations)
+- ✅ User management and analytics
 - ✅ Department-based event organization
 - ✅ Real-time event updates
-- ✅ Event statistics and analytics
+- ✅ Comprehensive event statistics and analytics
+- ✅ User statistics by department
+- ✅ Admin profile management
+- ✅ Event creation with department selection
+- ✅ Event editing with pre-filled forms
+- ✅ Event deletion with confirmation
+
+### **Calendar Features**
+
+- ✅ **Month View** - Traditional calendar grid with event indicators
+- ✅ **Week View** - Weekly timeline with event details
+- ✅ **Day View** - Detailed daily timeline with hour-by-hour events
+- ✅ **Current Time Indicator** - Red line showing current time in day view
+- ✅ **Event Popups** - Click events to see full details
+- ✅ **Navigation** - Easy month/week/day navigation
+- ✅ **Responsive Design** - Works on all device sizes
 
 ### **Technical Features**
 
 - ✅ Role-based access control
 - ✅ JWT authentication with HTTP-only cookies
-- ✅ Responsive design with Tailwind CSS
+- ✅ Professional light theme UI design
 - ✅ Type-safe development with TypeScript
 - ✅ Database migrations with Prisma
-- ✅ Modern light theme UI
+- ✅ Modern dark theme UI
 - ✅ Real-time data updates
+- ✅ Responsive design with Tailwind CSS
+- ✅ Suspense boundaries for better UX
+- ✅ Form validation and error handling
+- ✅ Loading states and user feedback
 
 ## 🛠️ Development
 
@@ -382,6 +428,30 @@ npx prisma db push          # Push schema changes
 - **DigitalOcean** - VPS deployment
 - **AWS** - Cloud deployment
 
+## 🎨 UI/UX Design
+
+### **Design Philosophy**
+
+- **Professional Academic Theme** - Clean, university-appropriate design
+- **Light Theme** - Easy on the eyes with excellent contrast
+- **Consistent Color Scheme** - Blue primary colors with gray accents
+- **Accessible Design** - High contrast ratios and readable fonts
+
+### **Color Palette**
+
+- **Primary Blue**: `#2563eb` (blue-600)
+- **Text Colors**: `#111827` (gray-900), `#6b7280` (gray-600)
+- **Background**: `#f9fafb` (gray-50)
+- **Cards**: `#ffffff` (white) with subtle borders
+- **Accents**: `#10b981` (green-600), `#f59e0b` (orange-600)
+
+### **Typography**
+
+- **Headings**: Bold, dark gray for excellent readability
+- **Body Text**: Medium gray for comfortable reading
+- **Form Labels**: Dark gray for clear identification
+- **Input Text**: Dark gray for perfect visibility
+
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -396,6 +466,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For support, email your-email@example.com or create an issue in the repository.
+For support, email seniduravihara@gmail.com or create an issue in the repository.
 
 ---
